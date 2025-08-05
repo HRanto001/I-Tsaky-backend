@@ -3,7 +3,6 @@ package ranto.co.io.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ranto.co.io.entity.Payment;
@@ -11,6 +10,7 @@ import ranto.co.io.entity.PaymentStatus;
 import ranto.co.io.repository.PaymentRepository;
 import ranto.co.io.vola.VolaClient;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
@@ -22,23 +22,45 @@ public class VolaPollingService {
     private final VolaClient volaClient;
 
     @Scheduled(fixedDelay = 60000)
-    public void pollPayments() {
+    public void pollPayments() throws SQLException {
         List<Payment> verifyingPayments = paymentRepository.findByStatus(PaymentStatus.VERIFYING);
 
         for (Payment payment : verifyingPayments) {
-            JsonNode volaResponse = volaClient.checkPayment(
-                    payment.getPayerEmail(),
-                    payment.getPspType(),
-                    payment.getPspPaymentId()
-            );
+            JsonNode volaResponse;
+            try {
+                volaResponse = volaClient.checkPayment(
+                        payment.getPayerEmail(),
+                        payment.getPspType(),
+                        payment.getPspPaymentId()
+                );
+            } catch (Exception e) {
+                log.error("Erreur lors de la vérification du paiement {} : {}", payment.getPspPaymentId(), e.getMessage(), e);
+                continue; // passer au paiement suivant
+            }
 
-            if (volaResponse == null) continue;
+            if (volaResponse == null) {
+                log.warn("Réponse nulle pour le paiement {}", payment.getPspPaymentId());
+                continue;
+            }
 
-            String newStatus = volaResponse.get("verificationStatus").asText();
-            if (!newStatus.equalsIgnoreCase("VERIFYING")) {
-                payment.setStatus(PaymentStatus.valueOf(newStatus));
-                paymentRepository.save(payment);
-                log.info("Mise à jour du paiement {} avec statut {}", payment.getPspPaymentId(), newStatus);
+            JsonNode statusNode = volaResponse.get("verificationStatus");
+            if (statusNode == null) {
+                log.warn("Champ 'verificationStatus' manquant dans la réponse pour paiement {}", payment.getPspPaymentId());
+                continue;
+            }
+
+            String newStatusStr = statusNode.asText();
+            if (!newStatusStr.equalsIgnoreCase("VERIFYING")) {
+                try {
+                    PaymentStatus newStatus = PaymentStatus.valueOf(newStatusStr);
+                    payment.setStatus(newStatus);
+                    paymentRepository.save(payment);
+                    log.info("Mise à jour du paiement {} avec statut {}", payment.getPspPaymentId(), newStatus);
+                } catch (IllegalArgumentException e) {
+                    log.error("Statut de paiement inconnu '{}' pour paiement {}", newStatusStr, payment.getPspPaymentId());
+                } catch (Exception e) {
+                    log.error("Erreur lors de la sauvegarde du paiement {} : {}", payment.getPspPaymentId(), e.getMessage(), e);
+                }
             }
         }
     }
