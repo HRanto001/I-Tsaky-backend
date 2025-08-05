@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://.../tsinjo_prod
+    url: jdbc:postgresql://${DATABASE_HOST}:5432/${DATABASE_NAME}
   flyway:
     locations: classpath:db/migration,classpath:db/prod
 
