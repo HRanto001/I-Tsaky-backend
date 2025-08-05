@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Donor {
-    private String name;
-    private String email;
+  private String name;
+  private String email;
 }

@@ -11,41 +11,43 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class VolaClient {
 
-    @Value("${vola.api.url}")
-    private String baseUrl;
+  @Value("${vola.api.url}")
+  private String baseUrl;
 
-    @Value("${vola.api.key}")
-    private String apiKey;
+  @Value("${vola.api.key}")
+  private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = new RestTemplate();
 
-    public JsonNode createPayment(String payerEmail, String pspPaymentId) {
-        String url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/payment")
-                .queryParam("apiKey", apiKey)
-                .queryParam("payerEmail", payerEmail)
-                .queryParam("pspType", "ORANGE_MONEY")
-                .queryParam("pspPaymentId", pspPaymentId)
-                .toUriString();
+  public JsonNode createPayment(String payerEmail, String pspPaymentId) {
+    String url =
+        UriComponentsBuilder.fromHttpUrl(baseUrl + "/payment")
+            .queryParam("apiKey", apiKey)
+            .queryParam("payerEmail", payerEmail)
+            .queryParam("pspType", "ORANGE_MONEY")
+            .queryParam("pspPaymentId", pspPaymentId)
+            .toUriString();
 
-        try {
-            return restTemplate.postForObject(url, null, JsonNode.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur POST Vola : " + e.getMessage());
-        }
+    try {
+      return restTemplate.postForObject(url, null, JsonNode.class);
+    } catch (Exception e) {
+      throw new RuntimeException("Erreur POST Vola : " + e.getMessage());
     }
+  }
 
-    public JsonNode checkPayment(String payerEmail, String pspPaymentId, String paymentId) {
-        String url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/payment")
-                .queryParam("apiKey", apiKey)
-                .queryParam("payerEmail", payerEmail)
-                .queryParam("pspType", "ORANGE_MONEY")
-                .queryParam("pspPaymentId", pspPaymentId)
-                .toUriString();
+  public JsonNode checkPayment(String payerEmail, String pspPaymentId, String paymentId) {
+    String url =
+        UriComponentsBuilder.fromHttpUrl(baseUrl + "/payment")
+            .queryParam("apiKey", apiKey)
+            .queryParam("payerEmail", payerEmail)
+            .queryParam("pspType", "ORANGE_MONEY")
+            .queryParam("pspPaymentId", pspPaymentId)
+            .toUriString();
 
-        try {
-            return restTemplate.getForObject(url, JsonNode.class);
-        } catch (Exception e) {
-            return null; // silencieux
-        }
+    try {
+      return restTemplate.getForObject(url, JsonNode.class);
+    } catch (Exception e) {
+      return null; // silencieux
     }
+  }
 }
