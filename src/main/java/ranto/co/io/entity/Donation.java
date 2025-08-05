@@ -4,9 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Donation {
   private Donor donor;
   private Payment payment;

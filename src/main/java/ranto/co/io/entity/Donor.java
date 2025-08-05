@@ -1,3 +1,13 @@
 package ranto.co.io.entity;
 
-public record Donor(String name, String email) {}
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class Donor {
+    private String name;
+    private String email;
+}
