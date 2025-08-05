@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://.../tsinjo_preprod
+  flyway:
+    locations: classpath:db/migration,classpath:db/preprod
+
+env.name: PREPROD

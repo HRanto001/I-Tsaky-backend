@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tsinjo - Historique</title>
+</head>
+<body>
+
+<h1>Dons et Aides de Tsinjo</h1>
+
+<!-- Formulaire pour ajouter un don -->
+<form th:action="@{/donations}" method="post">
+    <input type="text" name="name" placeholder="Nom du donateur" required />
+    <input type="email" name="email" placeholder="Email du donateur" required />
+    <input type="number" name="amount" placeholder="Montant" required />
+    <input type="text" name="pspPaymentId" placeholder="Identifiant paiement Vola" required />
+    <button type="submit">Faire un don</button>
+</form>
+
+<hr/>
+
+<!-- Liste des DONS -->
+<h2>Liste des dons</h2>
+<ul>
+    <li th:each="don : ${donations}">
+        <b>[[${don.donor.name}]]</b> a donné <b>[[${don.payment.amount}]] Ar</b>
+        le [[${#temporals.format(don.payment.date, 'dd/MM/yyyy HH:mm')}]]
+        - Statut: [[${don.payment.status}]]
+    </li>
+</ul>
+
+<!-- Liste des AIDES -->
+<h2>Liste des aides</h2>
+<ul>
+    <li th:each="help : ${helps}">
+        <b>[[${help.beneficiary.name}]]</b> a reçu <b>[[${help.payment.amount}]] Ar</b>
+        le [[${#temporals.format(help.payment.date, 'dd/MM/yyyy HH:mm')}]]
+        pour : [[${help.description}]]
+    </li>
+</ul>
+
+</body>
+</html>
