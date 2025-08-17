@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @PojaGenerated
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "ranto.co.io")
-@EntityScan(basePackages = "ranto.co.io.entity")
 public class PojaApplication {
 
   public static void main(String[] args) {

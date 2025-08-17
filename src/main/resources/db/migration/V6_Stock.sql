@@ -1,0 +1,7 @@
+CREATE TABLE stocks if not exist(
+                        id SERIAL PRIMARY KEY,
+                        nom_matiere VARCHAR(150) NOT NULL,
+                        quantite INT NOT NULL,
+                        unite VARCHAR(50) CHECK (unite IN ('Kg', 'Litre', 'Unité')),
+                        seuil_alerte INT DEFAULT 0
+);

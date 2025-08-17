@@ -1,50 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<meta charset="UTF-8" />
-<head>
-    <title>Tsinjo - Historique</title>
-</head>
-<style>
-    body { font-family: sans-serif; margin: 20px; }
-    form input { margin: 5px; padding: 5px; }
-    button { padding: 5px 10px; }
-    hr { margin: 20px 0; }
-</style>
-
 <body>
+<div th:fragment="content">
+    <div class="text-center mt-5">
+        <h1 class="mb-4">Bienvenue sur MadaChips</h1>
+        <p class="lead">Application de gestion de produits, clients et commandes.</p>
 
-<h1>Dons et Aides Tsinjo</h1>
-
-<!-- Formulaire pour ajouter un don -->
-<form th:action="@{/donations}" method="post">
-    <input type="text" name="name" placeholder="Nom du donateur" required />
-    <input type="email" name="email" placeholder="Email du donateur" required />
-    <input type="number" name="amount" placeholder="Montant" required />
-    <input type="text" name="pspPaymentId" placeholder="Identifiant paiement Vola" required />
-    <button type="submit">Faire un don</button>
-</form>
-
-<hr/>
-
-<!-- Liste des DONS -->
-<h2>Liste des dons</h2>
-<ul>
-    <li th:each="don : ${donations}">
-        <b>[[${don.donor.name}]]</b> a donné <b>[[${don.payment.amount}]] Ar</b>
-        le [[${#temporals.format(don.payment.date, 'dd/MM/yyyy HH:mm')}]]
-        - Statut: [[${don.payment.status}]]
-    </li>
-</ul>
-
-<!-- Liste des AIDES -->
-<h2>Liste des aides</h2>
-<ul>
-    <li th:each="help : ${helps}">
-        <b>[[${help.beneficiary.name}]]</b> a reçu <b>[[${help.payment.amount}]] Ar</b>
-        le [[${#temporals.format(help.payment.date, 'dd/MM/yyyy HH:mm')}]]
-        pour : [[${help.description}]]
-    </li>
-</ul>
-
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a class="btn btn-primary btn-lg" th:href="@{/produits}">Gérer Produits</a>
+            <a class="btn btn-success btn-lg" th:href="@{/clients}">Gérer Clients</a>
+            <a class="btn btn-warning btn-lg" th:href="@{/commandes}">Gérer Commandes</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

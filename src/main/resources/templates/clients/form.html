@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: content">
+<body>
+<h2 th:text="${client.id != null ? 'Modifier Client' : 'Ajouter Client'}"></h2>
+<form th:action="@{/clients/save}" th:object="${client}" method="post" class="card p-3">
+    <input type="hidden" th:field="*{id}">
+    <div class="mb-3">
+        <label>Nom</label>
+        <input type="text" class="form-control" th:field="*{nom}" required>
+    </div>
+    <div class="mb-3">
+        <label>Type de Client</label>
+        <select class="form-select" th:field="*{typeClient}">
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Téléphone</label>
+        <input type="text" class="form-control" th:field="*{telephone}">
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" class="form-control" th:field="*{email}">
+    </div>
+    <div class="mb-3">
+        <label>Adresse</label>
+        <input type="text" class="form-control" th:field="*{adresse}">
+    </div>
+    <button class="btn btn-success" type="submit">Enregistrer</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+    <h2>Liste des Clients</h2>
+    <a class="btn btn-primary mb-3" th:href="@{/clients/new}">+ Ajouter un client</a>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th><th>Nom</th><th>Type</th><th>Téléphone</th><th>Email</th><th>Adresse</th><th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${clients}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.nom}"></td>
+            <td th:text="${c.typeClient}"></td>
+            <td th:text="${c.telephone}"></td>
+            <td th:text="${c.email}"></td>
+            <td th:text="${c.adresse}"></td>
+            <td>
+                <a class="btn btn-sm btn-warning" th:href="@{|/clients/edit/${c.id}|}">Modifier</a>
+                <a class="btn btn-sm btn-danger" th:href="@{|/clients/delete/${c.id}|}">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

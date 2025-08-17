@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Commandes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5" th:fragment="content">
+    <h2>Liste des Commandes</h2>
+    <a class="btn btn-primary mb-3" th:href="@{/commandes/new}">+ Ajouter une commande</a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Détails</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="commande : ${commandes}">
+            <td th:text="${commande.id}"></td>
+            <td th:text="${commande.client.nom}"></td>
+            <td th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${commande.statut}"></td>
+            <td>
+                <table class="table table-sm mb-0">
+                    <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="detail : ${commande.details}">
+                        <td th:text="${detail.produit.nom}"></td>
+                        <td th:text="${detail.quantite}"></td>
+                        <td th:text="${#numbers.formatDecimal(detail.prixTotal, 0, 'POINT', 0, 'POINT')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-warning mb-1" th:href="@{|/commandes/edit/${commande.id}|}">Modifier</a>
+                <a class="btn btn-sm btn-danger mb-1" th:href="@{|/commandes/delete/${commande.id}|}">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
