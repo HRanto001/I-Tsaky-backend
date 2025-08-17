@@ -6,20 +6,22 @@ import ranto.co.io.model.enums.CategorieProduit;
 
 @Entity
 @Table(name = "produits")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Produit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String nom;
-    private Double prixUnitaire;
+  private String nom;
+  private Double prixUnitaire;
 
-    @Enumerated(EnumType.STRING)
-    private CategorieProduit categorie;
+  @Enumerated(EnumType.STRING)
+  private CategorieProduit categorie;
 
-    private Integer stockDisponible;
+  private Integer stockDisponible;
 }

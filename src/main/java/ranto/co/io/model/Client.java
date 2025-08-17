@@ -6,21 +6,23 @@ import ranto.co.io.model.enums.TypeClient;
 
 @Entity
 @Table(name = "clients")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Client {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String nom;
+  private String nom;
 
-    @Enumerated(EnumType.STRING)
-    private TypeClient typeClient;
+  @Enumerated(EnumType.STRING)
+  private TypeClient typeClient;
 
-    private String telephone;
-    private String email;
-    private String adresse;
+  private String telephone;
+  private String email;
+  private String adresse;
 }

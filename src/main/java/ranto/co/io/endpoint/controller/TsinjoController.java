@@ -1,26 +1,26 @@
-//package ranto.co.io.endpoint.controller;
+// package ranto.co.io.endpoint.controller;
 //
-//import java.sql.SQLException;
-//import java.time.LocalDateTime;
-//import java.util.Comparator;
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import ranto.co.io.entity.Donation;
-//import ranto.co.io.entity.Donor;
-//import ranto.co.io.entity.Help;
-//import ranto.co.io.entity.Payment;
-//import ranto.co.io.entity.PaymentStatus;
-//import ranto.co.io.repository.DonationRepository;
-//import ranto.co.io.repository.HelpRepository;
+// import java.sql.SQLException;
+// import java.time.LocalDateTime;
+// import java.util.Comparator;
+// import java.util.List;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.stereotype.Controller;
+// import org.springframework.ui.Model;
+// import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.PostMapping;
+// import org.springframework.web.bind.annotation.RequestParam;
+// import ranto.co.io.entity.Donation;
+// import ranto.co.io.entity.Donor;
+// import ranto.co.io.entity.Help;
+// import ranto.co.io.entity.Payment;
+// import ranto.co.io.entity.PaymentStatus;
+// import ranto.co.io.repository.DonationRepository;
+// import ranto.co.io.repository.HelpRepository;
 //
-//@Controller
-//@RequiredArgsConstructor
-//public class TsinjoController {
+// @Controller
+// @RequiredArgsConstructor
+// public class TsinjoController {
 //
 //  private final DonationRepository donationRepository;
 //  private final HelpRepository helpRepository;
@@ -29,12 +29,14 @@
 //  public String showPage(Model model) throws SQLException {
 //    List<Donation> donations =
 //        donationRepository.findAll().stream()
-//            .sorted(Comparator.comparing(d -> d.getPayment().getDate(), Comparator.reverseOrder()))
+//            .sorted(Comparator.comparing(d -> d.getPayment().getDate(),
+// Comparator.reverseOrder()))
 //            .toList();
 //
 //    List<Help> helps =
 //        helpRepository.findAll().stream()
-//            .sorted(Comparator.comparing(h -> h.getPayment().getDate(), Comparator.reverseOrder()))
+//            .sorted(Comparator.comparing(h -> h.getPayment().getDate(),
+// Comparator.reverseOrder()))
 //            .toList();
 //
 //    model.addAttribute("donations", donations);
@@ -75,4 +77,4 @@
 //
 //    return "redirect:/";
 //  }
-//}
+// }
