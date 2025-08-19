@@ -1,32 +1,46 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: content">
-<body>
-<h2 th:text="${client.id != null ? 'Modifier Client' : 'Ajouter Client'}"></h2>
-<form th:action="@{/clients/save}" th:object="${client}" method="post" class="card p-3">
-    <input type="hidden" th:field="*{id}">
-    <div class="mb-3">
-        <label>Nom</label>
-        <input type="text" class="form-control" th:field="*{nom}" required>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clients</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+
+<h2 class="mb-4">Liste des Clients</h2>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.id}"></td>
+        <td th:text="${client.nom}"></td>
+        <td th:text="${client.email}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 class="mt-5">Ajouter un Client</h3>
+
+<form th:action="@{/clients/save}" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Nom</label>
+        <input type="text" name="nom" class="form-control" required>
     </div>
-    <div class="mb-3">
-        <label>Type de Client</label>
-        <select class="form-select" th:field="*{typeClient}">
-            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
-        </select>
+    <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" required>
     </div>
-    <div class="mb-3">
-        <label>Téléphone</label>
-        <input type="text" class="form-control" th:field="*{telephone}">
+    <div class="col-12">
+        <button class="btn btn-primary">Enregistrer</button>
     </div>
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" class="form-control" th:field="*{email}">
-    </div>
-    <div class="mb-3">
-        <label>Adresse</label>
-        <input type="text" class="form-control" th:field="*{adresse}">
-    </div>
-    <button class="btn btn-success" type="submit">Enregistrer</button>
 </form>
+
 </body>
 </html>

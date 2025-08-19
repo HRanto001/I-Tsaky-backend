@@ -32,11 +32,11 @@ public class CommandeMvcController {
 
   @GetMapping("/new")
   public String formCommande(Model model) {
-    model.addAttribute("commande", new Commande());
     model.addAttribute("clients", clientService.findAll());
     model.addAttribute("produits", produitService.findAll());
     model.addAttribute("statuts", StatutCommande.values());
-    return "commandes/form";
+    model.addAttribute("commande", new Commande());
+    return "commandes/form"; // le template Thymeleaf
   }
 
   @GetMapping("/edit/{id}")

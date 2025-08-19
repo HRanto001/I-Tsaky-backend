@@ -1,90 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="content">
-    <h2 th:text="${commande.id != null} ? 'Modifier la commande' : 'Nouvelle commande'"></h2>
+<head>
+    <meta charset="UTF-8">
+    <title>Commandes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
 
-    <form th:action="@{/commandes/save}" th:object="${commande}" method="post">
-        <!-- Client -->
-        <div class="mb-3">
-            <label for="client" class="form-label">Client</label>
-            <select id="client" class="form-select" th:field="*{client.id}" required>
-                <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.nom}"></option>
-            </select>
-        </div>
+<h2 class="mb-4">Liste des Commandes</h2>
 
-        <!-- Statut -->
-        <div class="mb-3">
-            <label for="statut" class="form-label">Statut</label>
-            <select id="statut" class="form-select" th:field="*{statut}" required>
-                <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
-            </select>
-        </div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Produit</th>
+        <th>Quantité</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="commande : ${commandes}">
+        <td th:text="${commande.id}"></td>
+        <td th:text="${commande.dateCommande}"></td>
+        <td th:text="${commande.client.nom}"></td>
+        <td th:text="${commande.produit.nom}"></td>
+        <td th:text="${commande.quantite}"></td>
+    </tr>
+    </tbody>
+</table>
 
-        <!-- Détails de commande -->
-        <h4>Détails de la commande</h4>
-        <table class="table table-striped" id="detailsTable">
-            <thead>
-            <tr>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Prix total</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="detail, iterStat : *{details}">
-                <td>
-                    <select th:field="*{details[__${iterStat.index}__].produit.id}" class="form-select" required>
-                        <option th:each="p : ${produits}" th:value="${p.id}" th:text="${p.nom}"></option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" min="1" th:field="*{details[__${iterStat.index}__].quantite}" class="form-control" required/>
-                </td>
-                <td>
-                    <input type="text" th:field="*{details[__${iterStat.index}__].prixTotal}" class="form-control" readonly/>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">Supprimer</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+<h3 class="mt-5">Ajouter une Commande</h3>
 
-        <button type="button" class="btn btn-secondary mb-3" onclick="addRow()">+ Ajouter un produit</button>
+<form th:action="@{/commandes/save}" method="post" class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label">Client</label>
+        <select class="form-select" name="clientId" required>
+            <option th:each="client : ${clients}"
+                    th:value="${client.id}"
+                    th:text="${client.nom}">
+            </option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Produit</label>
+        <select class="form-select" name="produitId" required>
+            <option th:each="produit : ${produits}"
+                    th:value="${produit.id}"
+                    th:text="${produit.nom}">
+            </option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Quantité</label>
+        <input type="number" name="quantite" class="form-control" required>
+    </div>
+    <div class="col-12">
+        <button class="btn btn-success">Enregistrer</button>
+    </div>
+</form>
 
-        <div>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a th:href="@{/commandes}" class="btn btn-secondary">Annuler</a>
-        </div>
-    </form>
-</div>
-
-<script>
-    // Supprimer une ligne
-    function removeRow(btn) {
-        const row = btn.closest('tr');
-        row.remove();
-    }
-
-    // Ajouter une ligne vide
-    function addRow() {
-        const table = document.getElementById('detailsTable').getElementsByTagName('tbody')[0];
-        const rowCount = table.rows.length;
-        const row = table.insertRow();
-
-        row.innerHTML = `
-            <td>
-                <select name="details[${rowCount}].produit.id" class="form-select" required>
-                    <option th:each="p : ${produits}" th:value="\${p.id}" th:text="\${p.nom}"></option>
-                </select>
-            </td>
-            <td><input type="number" name="details[${rowCount}].quantite" min="1" class="form-control" required></td>
-            <td><input type="text" name="details[${rowCount}].prixTotal" class="form-control" readonly></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Supprimer</button></td>
-        `;
-    }
-</script>
 </body>
 </html>

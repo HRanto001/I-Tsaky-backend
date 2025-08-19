@@ -1,5 +1,6 @@
 package ranto.co.io.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -30,17 +31,34 @@ public class CommandeService {
   }
 
   public Commande save(Commande commande) {
-    // Calcul automatique du prix total
-    for (CommandeDetail detail : commande.getDetails()) {
-      Produit produit =
-          produitRepository
-              .findById(detail.getProduit().getId())
-              .orElseThrow(
-                  () ->
-                      new RuntimeException("Produit introuvable : " + detail.getProduit().getId()));
-      detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
-      detail.setCommande(commande);
+    if (commande.getId() == null) {
+      commande.setDateCommande(LocalDateTime.now()); // seulement à la création
     }
+
+    if (commande.getDetails() != null) {
+      for (CommandeDetail detail : commande.getDetails()) {
+        if (detail.getProduit() == null || detail.getProduit().getId() == null) {
+          throw new RuntimeException("Produit manquant dans le détail de commande");
+        }
+
+        Produit produit =
+            produitRepository
+                .findById(detail.getProduit().getId())
+                .orElseThrow(
+                    () ->
+                        new RuntimeException(
+                            "Produit introuvable : " + detail.getProduit().getId()));
+
+        if (produit.getPrixUnitaire() == null) {
+          throw new RuntimeException(
+              "Le produit " + produit.getNom() + " n'a pas de prix unitaire défini");
+        }
+
+        detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
+        detail.setCommande(commande);
+      }
+    }
+
     return commandeRepository.save(commande);
   }
 

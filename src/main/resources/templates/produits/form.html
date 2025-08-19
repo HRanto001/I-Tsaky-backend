@@ -1,32 +1,46 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: content">
-<body>
-<h2 th:text="${produit.id != null ? 'Modifier un produit' : 'Ajouter un produit'}"></h2>
-<form th:action="@{/produits/save}" th:object="${produit}" method="post" class="card p-3">
-    <input type="hidden" th:field="*{id}">
-    <div class="mb-3">
-        <label>Nom</label>
-        <input type="text" class="form-control" th:field="*{nom}" required>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+
+<h2 class="mb-4">Liste des Produits</h2>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Prix</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="produit : ${produits}">
+        <td th:text="${produit.id}"></td>
+        <td th:text="${produit.nom}"></td>
+        <td th:text="${produit.prix}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 class="mt-5">Ajouter un Produit</h3>
+
+<form th:action="@{/produits/save}" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Nom</label>
+        <input type="text" name="nom" class="form-control" required>
     </div>
-    <div class="mb-3">
-        <label>Description</label>
-        <textarea class="form-control" th:field="*{description}"></textarea>
+    <div class="col-md-6">
+        <label class="form-label">Prix</label>
+        <input type="number" step="0.01" name="prix" class="form-control" required>
     </div>
-    <div class="mb-3">
-        <label>Catégorie</label>
-        <select class="form-select" th:field="*{categorie}">
-            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"></option>
-        </select>
+    <div class="col-12">
+        <button class="btn btn-primary">Enregistrer</button>
     </div>
-    <div class="mb-3">
-        <label>Prix</label>
-        <input type="number" class="form-control" th:field="*{prixUnitaire}" step="0.01" required>
-    </div>
-    <div class="mb-3">
-        <label>Stock disponible</label>
-        <input type="number" class="form-control" th:field="*{stockDisponible}">
-    </div>
-    <button class="btn btn-success" type="submit">Enregistrer</button>
 </form>
+
 </body>
 </html>
