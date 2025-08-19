@@ -26,4 +26,9 @@ public class CommandeDetail {
 
   private Integer quantite;
   private Double prixTotal;
+
+  public CommandeDetail(long l, Commande s) {
+    this.id = l;
+    this.commande = s;
+  }
 }
