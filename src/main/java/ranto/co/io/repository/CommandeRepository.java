@@ -1,5 +1,6 @@
 package ranto.co.io.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,8 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
             "GROUP BY d.produit.nom " +
             "ORDER BY SUM(d.quantite) DESC")
     List<TopProductDto> findTopProducts(@Param("startDate") LocalDateTime startDate);
+
+    // Somme entre deux dates
+    @Query("SELECT COALESCE(SUM(d.prixTotal), 0) FROM Commande c JOIN c.details d WHERE c.dateCommande >= :startDate AND c.dateCommande <= :endDate")
+    Double sumRevenueBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

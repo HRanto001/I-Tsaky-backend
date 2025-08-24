@@ -69,6 +69,24 @@ public class ReportController {
         };
     }
 
+    @GetMapping("/growth")
+    public Map<String, String> getGrowth(@RequestParam String period) {
+        LocalDateTime start = getStartDate(period);
+        LocalDateTime end = LocalDateTime.now();
+        String growth = reportService.calculateGrowth(LocalDate.from(start).atStartOfDay(), LocalDate.from(end).atStartOfDay());
+        return Map.of("growth", growth);
+    }
+
+    @GetMapping("/sales-goal")
+    public Map<String, String> getSalesGoal() {
+        return Map.of("salesGoal", reportService.getSalesGoal());
+    }
+
+    @GetMapping("/customer-satisfaction")
+    public Map<String, String> getCustomerSatisfaction() {
+        return Map.of("customerSatisfaction", reportService.getCustomerSatisfaction());
+    }
+
     private LocalDateTime getPreviousStartDate(String period) {
         LocalDateTime now = LocalDateTime.now();
         return switch (period) {

@@ -49,4 +49,34 @@ public class ReportService {
         double growth = ((current - previous) / previous) * 100;
         return String.format("%.2f%%", growth);
     }
+
+    // =======================
+    // Growth
+    // =======================
+    public String calculateGrowth(LocalDateTime startDate, LocalDateTime endDate) {
+        Double revenueCurrent = commandeRepository.sumRevenueBetween(startDate, endDate);
+        Double revenuePrevious = commandeRepository.sumRevenueBetween(
+                startDate.minusDays(endDate.toLocalDate().toEpochDay() - startDate.toLocalDate().toEpochDay()),
+                startDate.minusDays(1)
+        );
+
+        if (revenuePrevious == null || revenuePrevious == 0) return "0%";
+
+        double growth = ((revenueCurrent - revenuePrevious) / revenuePrevious) * 100;
+        return String.format("%.2f%%", growth);
+    }
+
+    // =======================
+    // Sales Goal (valeur fixe)
+    // =======================
+    public String getSalesGoal() {
+        return "85%"; // valeur fixe
+    }
+
+    // =======================
+    // Customer Satisfaction (valeur fixe)
+    // =======================
+    public String getCustomerSatisfaction() {
+        return "92%"; // valeur fixe
+    }
 }
