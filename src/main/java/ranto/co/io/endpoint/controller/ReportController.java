@@ -24,14 +24,22 @@ public class ReportController {
     @GetMapping("/reports")
     public Map<String, Object> getReports(@RequestParam String period) {
         LocalDateTime startDate = getStartDate(period);
+        LocalDateTime prevStartDate = getPreviousStartDate(period);
 
-        Long orders = reportService.countOrders(LocalDate.from(startDate));
+        // ⚡ Période actuelle
+        Long orders = reportService.countOrders(startDate);
         Double revenue = reportService.sumRevenue(LocalDate.from(startDate));
         Double expenses = reportService.sumExpenses(LocalDate.from(startDate));
-        List<TopProductDto> topProducts = reportService.findTopProducts(LocalDate.from(startDate));
+        List<TopProductDto> topProducts = reportService.findTopProducts(startDate);
+        String mainExpense = reportService.findMainExpense(LocalDate.from(startDate));
 
-        String growth = "+0%"; // tu peux calculer par rapport à la période précédente
+        // ⚡ Période précédente (pour le calcul du growth)
+        Double prevRevenue = reportService.sumRevenue(LocalDate.from(prevStartDate));
 
+        // Calcul du growth
+        String growth = reportService.calculateGrowth(revenue, prevRevenue);
+
+        // Construction de la réponse
         Map<String, Object> sales = Map.of(
                 "revenue", revenue,
                 "orders", orders,
@@ -40,7 +48,7 @@ public class ReportController {
 
         Map<String, Object> expensesMap = Map.of(
                 "total", expenses,
-                "main", "Matière première: XXX Ar"
+                "main", mainExpense
         );
 
         Map<String, Object> response = new HashMap<>();
@@ -53,11 +61,21 @@ public class ReportController {
 
     private LocalDateTime getStartDate(String period) {
         LocalDateTime now = LocalDateTime.now();
-        switch (period) {
-            case "week": return now.minusWeeks(1);
-            case "month": return now.minusMonths(1);
-            case "year": return now.minusYears(1);
-            default: return now.minusMonths(1);
-        }
+        return switch (period) {
+            case "week" -> now.minusWeeks(1);
+            case "month" -> now.minusMonths(1);
+            case "year" -> now.minusYears(1);
+            default -> now.minusMonths(1);
+        };
+    }
+
+    private LocalDateTime getPreviousStartDate(String period) {
+        LocalDateTime now = LocalDateTime.now();
+        return switch (period) {
+            case "week" -> now.minusWeeks(2);
+            case "month" -> now.minusMonths(2);
+            case "year" -> now.minusYears(2);
+            default -> now.minusMonths(2);
+        };
     }
 }
