@@ -51,4 +51,9 @@ public class StockController {
     repository.deleteById(id);
     return ResponseEntity.noContent().build();
   }
+
+  @GetMapping("/low")
+  public List<Stock> getLowStock() {
+    return repository.findByQuantiteLessThanEqual(10);
+  }
 }
