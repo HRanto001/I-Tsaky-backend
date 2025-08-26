@@ -1,7 +1,8 @@
 package ranto.co.io.service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 import ranto.co.io.model.ActivationKey;
 import ranto.co.io.repository.ActivationKeyRepository;
@@ -15,11 +16,22 @@ public class ActivationKeyService {
     this.activationKeyRepository = activationKeyRepository;
   }
 
-  // Génération d’une clé
+  public List<ActivationKey> getAllKeys() {
+    return activationKeyRepository.findAll();
+  }
+
   public ActivationKey generateKey() {
+    // Générer une clé alphanumérique de 8 caractères
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    StringBuilder keyValue = new StringBuilder();
+    Random random = new Random();
+    for (int i = 0; i < 8; i++) {
+      keyValue.append(chars.charAt(random.nextInt(chars.length())));
+    }
+
     ActivationKey key =
         ActivationKey.builder()
-            .keyValue(UUID.randomUUID().toString())
+            .keyValue(keyValue.toString())
             .used(false)
             .createdAt(LocalDateTime.now())
             .expiresAt(LocalDateTime.now().plusDays(1))
