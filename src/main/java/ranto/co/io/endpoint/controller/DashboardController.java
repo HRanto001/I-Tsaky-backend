@@ -2,10 +2,8 @@ package ranto.co.io.endpoint.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.web.bind.annotation.*;
 import ranto.co.io.repository.CommandeRepository;
-import ranto.co.io.repository.DepenseRepository;
 import ranto.co.io.service.DashboardService;
 
 @RestController
@@ -13,11 +11,12 @@ import ranto.co.io.service.DashboardService;
 public class DashboardController {
 
   private final DashboardService dashboardService;
-    private final CommandeRepository commandeRepository;
+  private final CommandeRepository commandeRepository;
 
-  public DashboardController(DashboardService dashboardService, CommandeRepository commandeRepository) {
+  public DashboardController(
+      DashboardService dashboardService, CommandeRepository commandeRepository) {
     this.dashboardService = dashboardService;
-      this.commandeRepository = commandeRepository;
+    this.commandeRepository = commandeRepository;
   }
 
   @GetMapping("/benefice")
@@ -43,8 +42,8 @@ public class DashboardController {
     }
   }
 
-    @GetMapping("/top-products")
-    public List<Object[]> getTopProducts() {
-        return commandeRepository.findTopProducts();
-    }
+  @GetMapping("/top-products")
+  public List<Object[]> getTopProducts() {
+    return commandeRepository.findTopProducts();
+  }
 }

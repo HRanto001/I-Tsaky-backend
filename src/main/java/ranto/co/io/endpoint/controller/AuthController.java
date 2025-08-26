@@ -22,17 +22,23 @@ public class AuthController {
   private final UtilisateurRepository utilisateurRepository;
 
   @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody Utilisateur utilisateur) {
+  public ResponseEntity<?> register(
+      @RequestParam("activationKey") String activationKey, // clé fournie dans l'URL ou query
+      @RequestBody Utilisateur utilisateur) {
     try {
-      Utilisateur savedUser = authService.register(utilisateur);
+      Utilisateur savedUser = authService.register(utilisateur, activationKey); // on passe la clé
+
       return ResponseEntity.ok(
           Map.of(
               "id", savedUser.getId(),
               "nom", savedUser.getNom(),
               "email", savedUser.getEmail(),
-              "role", savedUser.getRole()));
+              "role", savedUser.getRole(),
+              "message", "Utilisateur créé avec succès"));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError().body(Map.of("error", "Erreur interne"));
     }
   }
 
