@@ -22,7 +22,7 @@ public class ActivationKeyService {
             .keyValue(UUID.randomUUID().toString())
             .used(false)
             .createdAt(LocalDateTime.now())
-            .expiresAt(LocalDateTime.now().plusHours(2))
+            .expiresAt(LocalDateTime.now().plusDays(1))
             .build();
 
     return activationKeyRepository.save(key);
