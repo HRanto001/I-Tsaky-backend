@@ -23,18 +23,26 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<?> register(
-      @RequestParam("activationKey") String activationKey, // clé fournie dans l'URL ou query
-      @RequestBody Utilisateur utilisateur) {
+      @RequestParam("activationKey") String activationKey, @RequestBody Utilisateur utilisateur) {
     try {
-      Utilisateur savedUser = authService.register(utilisateur, activationKey); // on passe la clé
+      // vérification de la clé
+      Utilisateur savedUser = authService.register(utilisateur, activationKey);
 
+      // Récupérer le rôle sous forme de String
+      String userRole = savedUser.getRole().name();
+
+      // Générer le token avec email (subject) et rôle (claim)
+      String token = jwtUtil.generateToken(savedUser.getEmail(), userRole);
+
+      // réponse JSON
       return ResponseEntity.ok(
           Map.of(
               "id", savedUser.getId(),
               "nom", savedUser.getNom(),
               "email", savedUser.getEmail(),
               "role", savedUser.getRole(),
-              "message", "Utilisateur créé avec succès"));
+              "token", token,
+              "message", "✅ Utilisateur créé et connecté avec succès"));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
