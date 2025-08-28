@@ -42,7 +42,7 @@ public class AuthController {
               "email", savedUser.getEmail(),
               "role", savedUser.getRole(),
               "token", token,
-              "message", "✅ Utilisateur créé et connecté avec succès"));
+              "message", "Utilisateur créé et connecté avec succès"));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
