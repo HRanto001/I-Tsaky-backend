@@ -1,7 +1,6 @@
 package ranto.co.io.endpoint.controller;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ranto.co.io.model.ActivationKey;
@@ -15,9 +14,10 @@ public class ActivationKeyController {
   private final ActivationKeyService activationKeyService;
   private final ActivationKeyRepository activationKeyRepository;
 
-  public ActivationKeyController(ActivationKeyService activationKeyService, ActivationKeyRepository activationKeyRepository) {
+  public ActivationKeyController(
+      ActivationKeyService activationKeyService, ActivationKeyRepository activationKeyRepository) {
     this.activationKeyService = activationKeyService;
-      this.activationKeyRepository = activationKeyRepository;
+    this.activationKeyRepository = activationKeyRepository;
   }
 
   // Récupérer toutes les clés
@@ -38,9 +38,9 @@ public class ActivationKeyController {
     return activationKeyService.useKey(key);
   }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        activationKeyRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
+    activationKeyRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
 }
