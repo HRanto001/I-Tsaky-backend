@@ -22,6 +22,6 @@ public class Depense {
   private TypeDepense typeDepense;
 
   private Double montant;
-  private LocalDate dateDepense = LocalDate.now();
+  private final LocalDate dateDepense = LocalDate.now();
   private String description;
 }

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: iTsaky-preprod
+    env: docker
+    branch: preprod
+    dockerfilePath: Dockerfile
+    plan: starter
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: preprod
+      - key: DATABASE_HOST
+        value: preprod-db-host
+      - key: DATABASE_NAME
+        value: preprod-db
+      - key: DATABASE_USERNAME
+        value: preprod-user
+      - key: DATABASE_PASSWORD
+        value: preprod-pass
+      - key: PORT
+        value: "8080"

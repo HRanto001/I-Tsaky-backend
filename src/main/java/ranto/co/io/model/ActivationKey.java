@@ -21,7 +21,8 @@ public class ActivationKey {
   private String keyValue;
 
   @Column(nullable = false)
-  private boolean used = false; // ✅ pour savoir si déjà utilisée
+  @Builder.Default
+  private boolean used = false;
 
   private LocalDateTime createdAt;
   private LocalDateTime expiresAt;

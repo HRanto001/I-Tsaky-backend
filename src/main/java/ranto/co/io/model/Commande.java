@@ -25,7 +25,7 @@ public class Commande {
   @JsonIgnoreProperties("commandes") // évite boucle si Client contient commandes
   private Client client;
 
-  private LocalDateTime dateCommande = LocalDateTime.now();
+  @Builder.Default private LocalDateTime dateCommande = LocalDateTime.now();
 
   @Enumerated(EnumType.STRING)
   private StatutCommande statut;

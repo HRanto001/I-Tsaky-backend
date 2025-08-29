@@ -22,6 +22,7 @@ public class Marketing {
   private CanalMarketing canal;
 
   private Double cout;
-  private LocalDate dateAction = LocalDate.now();
+
+  @Builder.Default private LocalDate dateAction = LocalDate.now();
   private String description;
 }
