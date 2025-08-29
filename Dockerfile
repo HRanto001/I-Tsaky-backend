@@ -2,6 +2,11 @@
 FROM gradle:8.3-jdk17 AS builder
 WORKDIR /app
 COPY . .
+
+# Donner les permissions d'exécution au wrapper Gradle
+RUN chmod +x gradlew
+
+# Build le projet en ignorant les tests
 RUN ./gradlew clean build -x test
 
 # Étape 2 : runtime
