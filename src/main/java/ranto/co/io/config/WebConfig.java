@@ -16,6 +16,7 @@ public class WebConfig {
         registry
             .addMapping("/**") // toutes les routes
             .allowedOrigins("http://localhost:5173") // ton frontend
+            .allowedOrigins("https://i-tsaky.vercel.app")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true);
