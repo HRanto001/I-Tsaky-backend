@@ -39,16 +39,19 @@ public class ActivationKeyService {
 
     return activationKeyRepository.save(key);
   }
-public ActivationKey createKey(String keyValue, int validDays) {
-        ActivationKey key = ActivationKey.builder()
-                .keyValue(keyValue)
-                .used(false)
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusDays(validDays))
-                .build();
 
-        return activationKeyRepository.save(key);
-    }
+  public ActivationKey createKey(String keyValue, int validDays) {
+    ActivationKey key =
+        ActivationKey.builder()
+            .keyValue(keyValue)
+            .used(false)
+            .createdAt(LocalDateTime.now())
+            .expiresAt(LocalDateTime.now().plusDays(validDays))
+            .build();
+
+    return activationKeyRepository.save(key);
+  }
+
   // Vérification et consommation
   public boolean useKey(String keyValue) {
     return activationKeyRepository
