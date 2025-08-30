@@ -1,4 +1,4 @@
-
+package ranto.co.io.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
