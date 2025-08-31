@@ -13,6 +13,7 @@ import ranto.co.io.security.JwtFilter;
 
 @Configuration
 @RequiredArgsConstructor
+// @EnableMethodSecurity
 public class SecurityConfig {
 
   private final JwtFilter jwtFilter;

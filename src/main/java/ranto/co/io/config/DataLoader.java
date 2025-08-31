@@ -1,14 +1,14 @@
-//package ranto.co.io.config;
+// package ranto.co.io.config;
 //
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.boot.CommandLineRunner;
-//import org.springframework.stereotype.Component;
-//import ranto.co.io.model.ActivationKey;
-//import ranto.co.io.service.ActivationKeyService;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.stereotype.Component;
+// import ranto.co.io.model.ActivationKey;
+// import ranto.co.io.service.ActivationKeyService;
 //
-//@Component
-//@RequiredArgsConstructor
-//public class DataLoader implements CommandLineRunner {
+// @Component
+// @RequiredArgsConstructor
+// public class DataLoader implements CommandLineRunner {
 //
 //  private final ActivationKeyService activationKeyService;
 //
@@ -21,4 +21,4 @@
 //    ActivationKey randomKey = activationKeyService.generateKey();
 //    System.out.println("Generated activation key: " + randomKey.getKeyValue());
 //  }
-//}
+// }

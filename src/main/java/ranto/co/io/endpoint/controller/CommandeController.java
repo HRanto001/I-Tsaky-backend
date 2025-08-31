@@ -28,13 +28,14 @@ public class CommandeController {
   private final UtilisateurRepository utilisateurRepository;
 
   public CommandeController(
-          CommandeService commandeService,
-          CommandeRepository commandeRepository,
-          StockRepository stockRepository, UtilisateurRepository utilisateurRepository) {
+      CommandeService commandeService,
+      CommandeRepository commandeRepository,
+      StockRepository stockRepository,
+      UtilisateurRepository utilisateurRepository) {
     this.commandeService = commandeService;
     this.commandeRepository = commandeRepository;
     this.stockRepository = stockRepository;
-      this.utilisateurRepository = utilisateurRepository;
+    this.utilisateurRepository = utilisateurRepository;
   }
 
   @GetMapping
@@ -51,7 +52,7 @@ public class CommandeController {
         .orElse(ResponseEntity.notFound().build());
   }
 
-    @PostMapping
+  @PostMapping
   public Commande createCommande(@RequestBody Commande commande) {
     return commandeService.save(commande);
   }
@@ -70,81 +71,92 @@ public class CommandeController {
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteCommande(@PathVariable Long id) {
     commandeService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
-    @GetMapping("/recent")
-    @PreAuthorize("hasAnyRole('ADMIN','VENTE','PRODUCTION','MARKETING')")
-    public Collection<Map<String, ? extends Serializable>> getRecentOrders(Authentication authentication) {
-        String username = authentication.getName();
-        Utilisateur user = utilisateurRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+  @GetMapping("/recent")
+  @PreAuthorize("hasAnyRole('ADMIN','VENTE','PRODUCTION','MARKETING')")
+  public Collection<Map<String, ? extends Serializable>> getRecentOrders(
+      Authentication authentication) {
+    String username = authentication.getName();
+    Utilisateur user =
+        utilisateurRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-        List<Commande> commandes;
+    List<Commande> commandes;
 
-        if(user.getRole() == Role.ADMIN) {
-            // admin voit toutes les commandes
-            commandes = commandeRepository.findTop10ByOrderByDateCommandeDesc();
-        } else {
-            // les autres voient seulement leurs commandes
-            commandes = commandeRepository.findTop10ByCreatedByOrderByDateCommandeDesc(user);
-        }
-
-        return commandes.stream()
-                .map(c -> Map.of(
-                        "id", c.getId(),
-                        "client", c.getClient().getNom(),
-                        "total", c.getDetails().stream().mapToDouble(d -> d.getPrixTotal() * d.getQuantite()).sum(),
-                        "status", c.getStatut().name(),
-                        "date", c.getDateCommande().toLocalDate().toString()
-                ))
-                .collect(Collectors.toList());
+    if (user.getRole() == Role.ADMIN) {
+      // admin voit toutes les commandes
+      commandes = commandeRepository.findTop10ByOrderByDateCommandeDesc();
+    } else {
+      // les autres voient seulement leurs commandes
+      commandes = commandeRepository.findTop10ByCreatedByOrderByDateCommandeDesc(user);
     }
 
-    @GetMapping("/mes-commandes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
-    public ResponseEntity<List<Commande>> getMesCommandes(Authentication authentication) {
-        String username = authentication.getName();
-        Utilisateur user = utilisateurRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+    return commandes.stream()
+        .map(
+            c ->
+                Map.of(
+                    "id", c.getId(),
+                    "client", c.getClient().getNom(),
+                    "total",
+                        c.getDetails().stream()
+                            .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
+                            .sum(),
+                    "status", c.getStatut().name(),
+                    "date", c.getDateCommande().toLocalDate().toString()))
+        .collect(Collectors.toList());
+  }
 
-        List<Commande> commandes = commandeRepository.findByCreatedBy(user);
-        return ResponseEntity.ok(commandes);
+  @GetMapping("/mes-commandes")
+  @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
+  public ResponseEntity<List<Commande>> getMesCommandes(Authentication authentication) {
+    String username = authentication.getName();
+    Utilisateur user =
+        utilisateurRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+    List<Commande> commandes = commandeRepository.findByCreatedBy(user);
+    return ResponseEntity.ok(commandes);
+  }
+
+  @GetMapping("/stats")
+  public DashboardStatsDTO getStats(Authentication authentication) {
+    String username = authentication.getName();
+    Utilisateur user =
+        utilisateurRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+    List<Commande> commandes;
+
+    // Si admin, on prend toutes les commandes, sinon seulement celles de l'utilisateur
+    if (user.getRole() == Role.ADMIN) {
+      commandes = commandeRepository.findAll();
+    } else {
+      commandes = commandeRepository.findByCreatedBy(user);
     }
 
-    @GetMapping("/stats")
-    public DashboardStatsDTO getStats(Authentication authentication) {
-        String username = authentication.getName();
-        Utilisateur user = utilisateurRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+    long clientsActifs = commandes.stream().map(c -> c.getClient().getId()).distinct().count();
 
-        List<Commande> commandes;
+    long produitsEnStock = stockRepository.count();
 
-        // Si admin, on prend toutes les commandes, sinon seulement celles de l'utilisateur
-        if (user.getRole() == Role.ADMIN) {
-            commandes = commandeRepository.findAll();
-        } else {
-            commandes = commandeRepository.findByCreatedBy(user);
-        }
-
-        long clientsActifs = commandes.stream()
-                .map(c -> c.getClient().getId())
-                .distinct()
-                .count();
-
-        long produitsEnStock = stockRepository.count();
-
-        double chiffreAffaires = commandes.stream()
-                .mapToDouble(c -> c.getDetails().stream()
+    double chiffreAffaires =
+        commandes.stream()
+            .mapToDouble(
+                c ->
+                    c.getDetails().stream()
                         .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
                         .sum())
-                .sum();
+            .sum();
 
-        long totalCommandes = commandes.size();
+    long totalCommandes = commandes.size();
 
-        return new DashboardStatsDTO(clientsActifs, produitsEnStock, chiffreAffaires, totalCommandes);
-    }
-
+    return new DashboardStatsDTO(clientsActifs, produitsEnStock, chiffreAffaires, totalCommandes);
+  }
 }
