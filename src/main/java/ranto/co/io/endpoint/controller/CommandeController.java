@@ -115,24 +115,36 @@ public class CommandeController {
     }
 
     @GetMapping("/stats")
-  public DashboardStatsDTO getStats() {
+    public DashboardStatsDTO getStats(Authentication authentication) {
+        String username = authentication.getName();
+        Utilisateur user = utilisateurRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-    long clientsActifs =
-        commandeRepository.findAll().stream().map(c -> c.getClient().getId()).distinct().count();
+        List<Commande> commandes;
 
-    long produitsEnStock = stockRepository.count();
+        // Si admin, on prend toutes les commandes, sinon seulement celles de l'utilisateur
+        if (user.getRole() == Role.ADMIN) {
+            commandes = commandeRepository.findAll();
+        } else {
+            commandes = commandeRepository.findByCreatedBy(user);
+        }
 
-    double chiffreAffaires =
-        commandeRepository.findAll().stream()
-            .mapToDouble(
-                c ->
-                    c.getDetails().stream()
+        long clientsActifs = commandes.stream()
+                .map(c -> c.getClient().getId())
+                .distinct()
+                .count();
+
+        long produitsEnStock = stockRepository.count();
+
+        double chiffreAffaires = commandes.stream()
+                .mapToDouble(c -> c.getDetails().stream()
                         .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
                         .sum())
-            .sum();
+                .sum();
 
-    long totalCommandes = commandeRepository.count();
+        long totalCommandes = commandes.size();
 
-    return new DashboardStatsDTO(clientsActifs, produitsEnStock, chiffreAffaires, totalCommandes);
-  }
+        return new DashboardStatsDTO(clientsActifs, produitsEnStock, chiffreAffaires, totalCommandes);
+    }
+
 }
