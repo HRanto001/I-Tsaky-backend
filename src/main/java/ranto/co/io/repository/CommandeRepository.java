@@ -13,8 +13,10 @@ import ranto.co.io.model.enums.StatutCommande;
 public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
   List<Commande> findTop10ByOrderByDateCommandeDesc();
+    List<Commande> findTop10ByCreatedByOrderByDateCommandeDesc(Utilisateur user);
 
-  List<Commande> findByStatut(StatutCommande statut);
+
+    List<Commande> findByStatut(StatutCommande statut);
 
     List<Commande> findByCreatedBy(Utilisateur user);
 

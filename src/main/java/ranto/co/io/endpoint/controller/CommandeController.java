@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ranto.co.io.endpoint.controller.dto.DashboardStatsDTO;
 import ranto.co.io.model.Commande;
 import ranto.co.io.model.Utilisateur;
+import ranto.co.io.model.enums.Role;
 import ranto.co.io.repository.CommandeRepository;
 import ranto.co.io.repository.StockRepository;
 import ranto.co.io.repository.UtilisateurRepository;
@@ -74,23 +75,33 @@ public class CommandeController {
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/recent")
-//  @PreAuthorize("hasRole('ADMIN')")
-  public Collection<Map<String, ? extends Serializable>> getRecentOrders() {
-    return commandeRepository.findTop10ByOrderByDateCommandeDesc().stream()
-        .map(
-            c ->
-                Map.of(
-                    "id", c.getId(),
-                    "client", c.getClient().getNom(),
-                    "total",
-                        c.getDetails().stream()
-                            .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
-                            .sum(),
-                    "status", c.getStatut().name(),
-                    "date", c.getDateCommande().toLocalDate().toString()))
-        .collect(Collectors.toList());
-  }
+    @GetMapping("/recent")
+    @PreAuthorize("hasAnyRole('ADMIN','VENTE','PRODUCTION','MARKETING')")
+    public Collection<Map<String, ? extends Serializable>> getRecentOrders(Authentication authentication) {
+        String username = authentication.getName();
+        Utilisateur user = utilisateurRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        List<Commande> commandes;
+
+        if(user.getRole() == Role.ADMIN) {
+            // admin voit toutes les commandes
+            commandes = commandeRepository.findTop10ByOrderByDateCommandeDesc();
+        } else {
+            // les autres voient seulement leurs commandes
+            commandes = commandeRepository.findTop10ByCreatedByOrderByDateCommandeDesc(user);
+        }
+
+        return commandes.stream()
+                .map(c -> Map.of(
+                        "id", c.getId(),
+                        "client", c.getClient().getNom(),
+                        "total", c.getDetails().stream().mapToDouble(d -> d.getPrixTotal() * d.getQuantite()).sum(),
+                        "status", c.getStatut().name(),
+                        "date", c.getDateCommande().toLocalDate().toString()
+                ))
+                .collect(Collectors.toList());
+    }
 
     @GetMapping("/mes-commandes")
     @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
