@@ -6,11 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ranto.co.io.endpoint.controller.dto.DashboardStatsDTO;
 import ranto.co.io.model.Commande;
+import ranto.co.io.model.Utilisateur;
 import ranto.co.io.repository.CommandeRepository;
 import ranto.co.io.repository.StockRepository;
+import ranto.co.io.repository.UtilisateurRepository;
 import ranto.co.io.service.CommandeService;
 
 @RestController
@@ -20,17 +24,20 @@ public class CommandeController {
   private final CommandeService commandeService;
   private final CommandeRepository commandeRepository;
   private final StockRepository stockRepository;
+  private final UtilisateurRepository utilisateurRepository;
 
   public CommandeController(
-      CommandeService commandeService,
-      CommandeRepository commandeRepository,
-      StockRepository stockRepository) {
+          CommandeService commandeService,
+          CommandeRepository commandeRepository,
+          StockRepository stockRepository, UtilisateurRepository utilisateurRepository) {
     this.commandeService = commandeService;
     this.commandeRepository = commandeRepository;
     this.stockRepository = stockRepository;
+      this.utilisateurRepository = utilisateurRepository;
   }
 
   @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public List<Commande> getAllCommandes() {
     return commandeService.findAll();
   }
@@ -43,7 +50,7 @@ public class CommandeController {
         .orElse(ResponseEntity.notFound().build());
   }
 
-  @PostMapping
+    @PostMapping
   public Commande createCommande(@RequestBody Commande commande) {
     return commandeService.save(commande);
   }
@@ -68,6 +75,7 @@ public class CommandeController {
   }
 
   @GetMapping("/recent")
+//  @PreAuthorize("hasRole('ADMIN')")
   public Collection<Map<String, ? extends Serializable>> getRecentOrders() {
     return commandeRepository.findTop10ByOrderByDateCommandeDesc().stream()
         .map(
@@ -84,7 +92,18 @@ public class CommandeController {
         .collect(Collectors.toList());
   }
 
-  @GetMapping("/stats")
+    @GetMapping("/mes-commandes")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
+    public ResponseEntity<List<Commande>> getMesCommandes(Authentication authentication) {
+        String username = authentication.getName();
+        Utilisateur user = utilisateurRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        List<Commande> commandes = commandeRepository.findByCreatedBy(user);
+        return ResponseEntity.ok(commandes);
+    }
+
+    @GetMapping("/stats")
   public DashboardStatsDTO getStats() {
 
     long clientsActifs =

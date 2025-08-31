@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ranto.co.io.endpoint.controller.dto.TopProductDto;
 import ranto.co.io.model.Commande;
+import ranto.co.io.model.Utilisateur;
 import ranto.co.io.model.enums.StatutCommande;
 
 public interface CommandeRepository extends JpaRepository<Commande, Long> {
@@ -15,7 +16,9 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
   List<Commande> findByStatut(StatutCommande statut);
 
-  // Produits les plus vendus
+    List<Commande> findByCreatedBy(Utilisateur user);
+
+    // Produits les plus vendus
   @Query(
       "SELECT cd.produit.nom, SUM(cd.quantite) as totalVendu "
           + "FROM CommandeDetail cd "

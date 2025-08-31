@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ranto.co.io.model.enums.StatutCommande;
 
 @Entity
@@ -15,22 +18,31 @@ import ranto.co.io.model.enums.StatutCommande;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Commande {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(optional = false)
-  @JsonIgnoreProperties("commandes") // évite boucle si Client contient commandes
-  private Client client;
+    @ManyToOne(optional = false)
+    @JsonIgnoreProperties("commandes")
+    private Client client;
 
-  @Builder.Default private LocalDateTime dateCommande = LocalDateTime.now();
+    private LocalDateTime dateCommande;
 
-  @Enumerated(EnumType.STRING)
-  private StatutCommande statut;
+    @Enumerated(EnumType.STRING)
+    private StatutCommande statut;
 
-  @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonManagedReference
-  private List<CommandeDetail> details;
+    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CommandeDetail> details;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private Utilisateur createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "updated_by")
+    private Utilisateur updatedBy;
 }
