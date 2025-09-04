@@ -149,10 +149,7 @@ public class CommandeController {
     double chiffreAffaires =
         commandes.stream()
             .mapToDouble(
-                c ->
-                    c.getDetails().stream()
-                        .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
-                        .sum())
+                c -> c.getDetails().stream().mapToDouble(CommandeDetail::getPrixTotal).sum())
             .sum();
 
     long totalCommandes = commandes.size();
