@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ranto.co.io.endpoint.controller.dto.DashboardStatsDTO;
 import ranto.co.io.model.Commande;
+import ranto.co.io.model.CommandeDetail;
 import ranto.co.io.model.Utilisateur;
 import ranto.co.io.model.enums.Role;
 import ranto.co.io.repository.CommandeRepository;
@@ -103,10 +104,9 @@ public class CommandeController {
                 Map.of(
                     "id", c.getId(),
                     "client", c.getClient().getNom(),
+                    // somme correcte du total
                     "total",
-                        c.getDetails().stream()
-                            .mapToDouble(d -> d.getPrixTotal() * d.getQuantite())
-                            .sum(),
+                        c.getDetails().stream().mapToDouble(CommandeDetail::getPrixTotal).sum(),
                     "status", c.getStatut().name(),
                     "date", c.getDateCommande().toLocalDate().toString()))
         .collect(Collectors.toList());

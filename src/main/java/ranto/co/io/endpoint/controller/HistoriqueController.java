@@ -1,6 +1,9 @@
 package ranto.co.io.endpoint.controller;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ranto.co.io.model.Historique;
 import ranto.co.io.repository.HistoriqueRepository;
@@ -16,7 +19,9 @@ public class HistoriqueController {
   }
 
   @GetMapping
-  public List<Historique> getAllHistoriques() {
-    return historiqueRepository.findAll();
+  public Page<Historique> getHistoriques(
+      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("dateAction").descending());
+    return historiqueRepository.findAll(pageable);
   }
 }
