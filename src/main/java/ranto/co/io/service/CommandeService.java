@@ -10,6 +10,7 @@ import ranto.co.io.model.Commande;
 import ranto.co.io.model.CommandeDetail;
 import ranto.co.io.model.Produit;
 import ranto.co.io.model.Utilisateur;
+import ranto.co.io.model.enums.StatutCommande;
 import ranto.co.io.repository.CommandeRepository;
 import ranto.co.io.repository.ProduitRepository;
 import ranto.co.io.repository.UtilisateurRepository;
@@ -109,6 +110,20 @@ public class CommandeService {
 
         return commandeRepository.save(commande);
     }
+
+    public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
+        Commande commande = commandeRepository.findById(commandeId)
+                .orElseThrow(() -> new RuntimeException("Commande introuvable"));
+
+        if (!commande.getStatut().peutChangerVers(nouveauStatut)) {
+            throw new RuntimeException("Transition de statut non autorisée : "
+                    + commande.getStatut() + " -> " + nouveauStatut);
+        }
+
+        commande.setStatut(nouveauStatut);
+        return commandeRepository.save(commande);
+    }
+
 
     public void delete(Long id) {
         commandeRepository.deleteById(id);

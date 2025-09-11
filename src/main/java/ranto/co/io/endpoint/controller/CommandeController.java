@@ -14,6 +14,7 @@ import ranto.co.io.model.Commande;
 import ranto.co.io.model.CommandeDetail;
 import ranto.co.io.model.Utilisateur;
 import ranto.co.io.model.enums.Role;
+import ranto.co.io.model.enums.StatutCommande;
 import ranto.co.io.repository.CommandeRepository;
 import ranto.co.io.repository.StockRepository;
 import ranto.co.io.repository.UtilisateurRepository;
@@ -125,7 +126,17 @@ public class CommandeController {
     return ResponseEntity.ok(commandes);
   }
 
-  @GetMapping("/stats")
+    @PatchMapping("/{id}/statut")
+    @PreAuthorize("hasAnyRole('ADMIN','VENTE')")
+    public ResponseEntity<Commande> changerStatut(
+            @PathVariable Long id,
+            @RequestParam StatutCommande statut) {
+
+        Commande updated = commandeService.changerStatut(id, statut);
+        return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/stats")
   public DashboardStatsDTO getStats(Authentication authentication) {
     String username = authentication.getName();
     Utilisateur user =
