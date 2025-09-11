@@ -136,6 +136,15 @@ public class CommandeController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("/{id}/statut")
+    public ResponseEntity<Commande> updateStatut(
+            @PathVariable Long id,
+            @RequestParam StatutCommande nouveauStatut) {
+        Commande commande = commandeService.updateStatut(id, nouveauStatut);
+        return ResponseEntity.ok(commande);
+    }
+
+
     @GetMapping("/stats")
   public DashboardStatsDTO getStats(Authentication authentication) {
     String username = authentication.getName();

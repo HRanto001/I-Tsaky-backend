@@ -3,6 +3,8 @@ package ranto.co.io.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -118,6 +120,32 @@ public class CommandeService {
         if (!commande.getStatut().peutChangerVers(nouveauStatut)) {
             throw new RuntimeException("Transition de statut non autorisée : "
                     + commande.getStatut() + " -> " + nouveauStatut);
+        }
+
+        commande.setStatut(nouveauStatut);
+        return commandeRepository.save(commande);
+    }
+
+    @Transactional
+    public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
+
+        // Vérifier les transitions possibles
+        switch (commande.getStatut()) {
+            case EN_ATTENTE:
+                if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
+                    throw new RuntimeException("Transition non autorisée");
+                }
+                break;
+            case PAYEE:
+                if (nouveauStatut != StatutCommande.LIVREE) {
+                    throw new RuntimeException("Transition non autorisée");
+                }
+                break;
+            case LIVREE:
+            case ANNULEE:
+                throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
         }
 
         commande.setStatut(nouveauStatut);
