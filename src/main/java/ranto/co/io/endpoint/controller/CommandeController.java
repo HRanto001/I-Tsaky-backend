@@ -126,26 +126,23 @@ public class CommandeController {
     return ResponseEntity.ok(commandes);
   }
 
-    @PatchMapping("/{id}/statut")
-    @PreAuthorize("hasAnyRole('ADMIN','VENTE')")
-    public ResponseEntity<Commande> changerStatut(
-            @PathVariable Long id,
-            @RequestParam StatutCommande statut) {
+  @PatchMapping("/{id}/statut")
+  @PreAuthorize("hasAnyRole('ADMIN','VENTE')")
+  public ResponseEntity<Commande> changerStatut(
+      @PathVariable Long id, @RequestParam StatutCommande statut) {
 
-        Commande updated = commandeService.changerStatut(id, statut);
-        return ResponseEntity.ok(updated);
-    }
+    Commande updated = commandeService.changerStatut(id, statut);
+    return ResponseEntity.ok(updated);
+  }
 
-    @PutMapping("/{id}/statut")
-    public ResponseEntity<Commande> updateStatut(
-            @PathVariable Long id,
-            @RequestParam StatutCommande nouveauStatut) {
-        Commande commande = commandeService.updateStatut(id, nouveauStatut);
-        return ResponseEntity.ok(commande);
-    }
+  @PutMapping("/{id}/statut")
+  public ResponseEntity<Commande> updateStatut(
+      @PathVariable Long id, @RequestParam StatutCommande nouveauStatut) {
+    Commande commande = commandeService.updateStatut(id, nouveauStatut);
+    return ResponseEntity.ok(commande);
+  }
 
-
-    @GetMapping("/stats")
+  @GetMapping("/stats")
   public DashboardStatsDTO getStats(Authentication authentication) {
     String username = authentication.getName();
     Utilisateur user =
