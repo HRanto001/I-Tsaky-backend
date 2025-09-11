@@ -13,12 +13,12 @@ import ranto.co.io.security.JwtFilter;
 
 import java.util.List;
 
+// @EnableMethodSecurity
 @Configuration
 @RequiredArgsConstructor
-// @EnableMethodSecurity
 public class SecurityConfig {
 
-  private final JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -33,7 +33,8 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Permettre le login et le ping sans JWT
+                        .requestMatchers("/api/auth/**", "/pingR").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -42,10 +43,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-      throws Exception {
-    return config.getAuthenticationManager();
-  }
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
+
