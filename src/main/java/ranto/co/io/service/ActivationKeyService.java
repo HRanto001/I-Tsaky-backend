@@ -2,6 +2,7 @@ package ranto.co.io.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import org.springframework.stereotype.Service;
 import ranto.co.io.model.ActivationKey;
@@ -66,5 +67,21 @@ public class ActivationKeyService {
               return true;
             })
         .orElse(false);
+  }
+
+  public boolean validateKeyForReset(String keyValue) {
+    return activationKeyRepository
+        .findByKeyValue(keyValue)
+        .filter(
+            key -> key.getExpiresAt() == null || key.getExpiresAt().isAfter(LocalDateTime.now()))
+        .isPresent();
+  }
+
+  public Optional<ActivationKey> findByValue(String value) {
+    return activationKeyRepository.findByKeyValue(value);
+  }
+
+  public ActivationKey save(ActivationKey key) {
+    return activationKeyRepository.save(key);
   }
 }

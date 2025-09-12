@@ -1,5 +1,6 @@
 package ranto.co.io.config;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,42 +12,47 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ranto.co.io.security.JwtFilter;
 
-import java.util.List;
-
 // @EnableMethodSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
+  private final JwtFilter jwtFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request -> {
-                    var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.setAllowedOrigins(
-                            List.of("http://localhost:5173", "https://i-tsaky.vercel.app"));
-                    corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfig.setAllowedHeaders(List.of("*"));
-                    corsConfig.setAllowCredentials(true);
-                    return corsConfig;
-                }))
-                .authorizeHttpRequests(auth -> auth
-                        // Permettre le login et le ping sans JWT
-                        .requestMatchers("/api/auth/**", "/pingR").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable())
+        .cors(
+            cors ->
+                cors.configurationSource(
+                    request -> {
+                      var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                      corsConfig.setAllowedOrigins(
+                          List.of("http://localhost:5173", "https://i-tsaky.vercel.app"));
+                      corsConfig.setAllowedMethods(
+                          List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                      corsConfig.setAllowedHeaders(List.of("*"));
+                      corsConfig.setAllowCredentials(true);
+                      return corsConfig;
+                    }))
+        .authorizeHttpRequests(
+            auth ->
+                auth
+                    // Permettre le login et le ping sans JWT
+                    .requestMatchers("/api/auth/**", "/pingR")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-        return config.getAuthenticationManager();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+      throws Exception {
+    return config.getAuthenticationManager();
+  }
 }
-

@@ -1,14 +1,18 @@
 package ranto.co.io.endpoint.controller;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import ranto.co.io.endpoint.controller.dto.ResetPasswordRequest;
 import ranto.co.io.model.LoginRequest;
 import ranto.co.io.model.Utilisateur;
 import ranto.co.io.repository.UtilisateurRepository;
 import ranto.co.io.security.JwtUtil;
+import ranto.co.io.service.ActivationKeyService;
 import ranto.co.io.service.AuthService;
 
 @RestController
@@ -20,6 +24,8 @@ public class AuthController {
   private final AuthService authService;
   private final JwtUtil jwtUtil;
   private final UtilisateurRepository utilisateurRepository;
+  private final ActivationKeyService activationKeyService;
+  private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   @PostMapping("/register")
   public ResponseEntity<?> register(
@@ -97,5 +103,47 @@ public class AuthController {
                         "email", user.getEmail(),
                         "role", user.getRole())))
         .orElse(ResponseEntity.status(404).body(Map.of("error", "Utilisateur non trouvé")));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    // Vérifier si l'utilisateur existe
+    return utilisateurRepository
+        .findByEmail(request.getEmail())
+        .map(
+            user -> {
+              // Chercher la clé
+              return activationKeyService
+                  .findByValue(request.getActivationKey())
+                  .map(
+                      key -> {
+                        // Vérifier expiration
+                        if (key.getExpiresAt() != null
+                            && key.getExpiresAt().isBefore(LocalDateTime.now())) {
+                          return ResponseEntity.badRequest().body(Map.of("error", "Clé expirée"));
+                        }
+
+                        // Vérifier si déjà utilisée
+                        if (key.isUsed()) {
+                          return ResponseEntity.badRequest()
+                              .body(Map.of("error", "Clé déjà utilisée"));
+                        }
+
+                        // Tout est bon → on met à jour le mot de passe
+                        user.setMotDePasse(passwordEncoder.encode(request.getNewPassword()));
+                        utilisateurRepository.save(user);
+
+                        // marquer la clé comme utilisée
+                        key.setUsed(true);
+                        activationKeyService.save(key);
+
+                        return ResponseEntity.ok(
+                            Map.of("message", "Mot de passe réinitialisé avec succès"));
+                      })
+                  .orElse(
+                      ResponseEntity.badRequest()
+                          .body(Map.of("error", "Clé d'activation introuvable")));
+            })
+        .orElse(ResponseEntity.status(404).body(Map.of("error", "Utilisateur introuvable")));
   }
 }
