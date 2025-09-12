@@ -28,7 +28,7 @@ public class HistoriqueFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    // ⚠️ wrap la request pour pouvoir relire le body après
+    //  wrap la request pour pouvoir relire le body après
     ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
 
     try {
@@ -54,16 +54,22 @@ public class HistoriqueFilter extends OncePerRequestFilter {
         payload = new String(buf, StandardCharsets.UTF_8);
       }
 
-      // 🚨 Sécurité : ne jamais stocker les mots de passe
-      if (endpoint.contains("/login") || endpoint.contains("/register")) {
+      // Sécurité : ne jamais stocker les mots de passe
+      if (endpoint.contains("/login") || endpoint.contains("/register") || endpoint.contains("/reset-password")) {
         try {
           // On parse le JSON et on supprime le champ password
           ObjectMapper mapper = new ObjectMapper();
           JsonNode jsonNode = mapper.readTree(payload);
+
           if (jsonNode.has("motDePasse")) {
             ((ObjectNode) jsonNode).put("motDePasse", "***SECRET***");
           }
-          payload = mapper.writeValueAsString(jsonNode);
+
+          if (jsonNode.has("newPassword")) {
+                ((ObjectNode) jsonNode).put("newPassword", "***SECRET***");
+          }
+
+            payload = mapper.writeValueAsString(jsonNode);
         } catch (Exception e) {
           // fallback si parsing échoue
           payload = "{ \"message\": \"Payload sensible masqué\" }";
