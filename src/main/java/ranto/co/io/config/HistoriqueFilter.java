@@ -43,7 +43,7 @@ public class HistoriqueFilter extends OncePerRequestFilter {
   private void enregistrerHistorique(ContentCachingRequestWrapper request) {
     String methode = request.getMethod();
 
-    if (methode.equals("POST") || methode.equals("PUT") || methode.equals("DELETE")) {
+    if (methode.equals("POST") || methode.equals("PUT") || methode.equals("PATCH") || methode.equals("DELETE")) {
       String endpoint = request.getRequestURI();
       String utilisateur = request.getRemoteUser() != null ? request.getRemoteUser() : "ANONYMOUS";
 
