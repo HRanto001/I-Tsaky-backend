@@ -43,7 +43,10 @@ public class HistoriqueFilter extends OncePerRequestFilter {
   private void enregistrerHistorique(ContentCachingRequestWrapper request) {
     String methode = request.getMethod();
 
-    if (methode.equals("POST") || methode.equals("PUT") || methode.equals("PATCH") || methode.equals("DELETE")) {
+    if (methode.equals("POST")
+        || methode.equals("PUT")
+        || methode.equals("PATCH")
+        || methode.equals("DELETE")) {
       String endpoint = request.getRequestURI();
       String utilisateur = request.getRemoteUser() != null ? request.getRemoteUser() : "ANONYMOUS";
 
@@ -55,7 +58,9 @@ public class HistoriqueFilter extends OncePerRequestFilter {
       }
 
       // Sécurité : ne jamais stocker les mots de passe
-      if (endpoint.contains("/login") || endpoint.contains("/register") || endpoint.contains("/reset-password")) {
+      if (endpoint.contains("/login")
+          || endpoint.contains("/register")
+          || endpoint.contains("/reset-password")) {
         try {
           // On parse le JSON et on supprime le champ password
           ObjectMapper mapper = new ObjectMapper();
@@ -66,10 +71,10 @@ public class HistoriqueFilter extends OncePerRequestFilter {
           }
 
           if (jsonNode.has("newPassword")) {
-                ((ObjectNode) jsonNode).put("newPassword", "***SECRET***");
+            ((ObjectNode) jsonNode).put("newPassword", "***SECRET***");
           }
 
-            payload = mapper.writeValueAsString(jsonNode);
+          payload = mapper.writeValueAsString(jsonNode);
         } catch (Exception e) {
           // fallback si parsing échoue
           payload = "{ \"message\": \"Payload sensible masqué\" }";

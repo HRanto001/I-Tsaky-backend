@@ -2,6 +2,8 @@ package ranto.co.io.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,12 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
   List<Commande> findByStatut(StatutCommande statut);
 
   List<Commande> findByCreatedBy(Utilisateur user);
+  Page<Commande> findByCreatedBy(Utilisateur user, Pageable pageable);
+
+  Page<Commande> findAllByOrderByDateCommandeDesc(Pageable pageable);
+
+  // Pagination pour un utilisateur précis (tri date desc)
+  Page<Commande> findByCreatedByOrderByDateCommandeDesc(Utilisateur user, Pageable pageable);
 
   // Produits les plus vendus
   @Query(

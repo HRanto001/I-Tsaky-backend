@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,14 @@ public class CommandeService {
 
   public Optional<Commande> findById(Long id) {
     return commandeRepository.findById(id);
+  }
+
+  public Page<Commande> findAllPaged(Pageable pageable) {
+    return commandeRepository.findAllByOrderByDateCommandeDesc(pageable);
+  }
+
+  public Page<Commande> findByUserPaged(Utilisateur user, Pageable pageable) {
+    return commandeRepository.findByCreatedByOrderByDateCommandeDesc(user, pageable);
   }
 
   public Commande save(Commande commande) {

@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -44,6 +48,32 @@ public class CommandeController {
   @PreAuthorize("hasRole('ADMIN')")
   public List<Commande> getAllCommandes() {
     return commandeService.findAll();
+  }
+
+  @GetMapping("/paged")
+  @PreAuthorize("hasAnyRole('ADMIN','VENTE','PRODUCTION','MARKETING')")
+  public ResponseEntity<Page<Commande>> getPagedCommandes(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      Authentication authentication) {
+
+    String username = authentication.getName();
+    Utilisateur user =
+        utilisateurRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+    PageRequest pageable = PageRequest.of(page, size, Sort.by("dateCommande").descending());
+
+    Page<Commande> commandes;
+
+    if (user.getRole() == Role.ADMIN) {
+      commandes = commandeService.findAllPaged(pageable);
+    } else {
+      commandes = commandeService.findByUserPaged(user, pageable);
+    }
+
+    return ResponseEntity.ok(commandes);
   }
 
   @GetMapping("/{id}")
@@ -126,7 +156,23 @@ public class CommandeController {
     return ResponseEntity.ok(commandes);
   }
 
-  @PatchMapping("/{id}/statut")
+    @GetMapping("/mes-commandes2")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
+    public ResponseEntity<Page<Commande>> getMesCommandes(
+            Authentication authentication,
+            Pageable pageable) {
+
+        String username = authentication.getName();
+        Utilisateur user = utilisateurRepository
+                .findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        Page<Commande> commandes = commandeRepository.findByCreatedBy(user, pageable);
+        return ResponseEntity.ok(commandes);
+    }
+
+
+    @PatchMapping("/{id}/statut")
   @PreAuthorize("hasAnyRole('ADMIN','VENTE')")
   public ResponseEntity<Commande> changerStatut(
       @PathVariable Long id, @RequestParam StatutCommande statut) {
