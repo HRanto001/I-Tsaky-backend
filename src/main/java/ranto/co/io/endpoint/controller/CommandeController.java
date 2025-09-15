@@ -156,23 +156,22 @@ public class CommandeController {
     return ResponseEntity.ok(commandes);
   }
 
-    @GetMapping("/mes-commandes2")
-    @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
-    public ResponseEntity<Page<Commande>> getMesCommandes(
-            Authentication authentication,
-            Pageable pageable) {
+  @GetMapping("/mes-commandes2")
+  @PreAuthorize("hasAnyRole('ADMIN', 'VENTE', 'PRODUCTION', 'MARKETING')")
+  public ResponseEntity<Page<Commande>> getMesCommandes(
+      Authentication authentication, Pageable pageable) {
 
-        String username = authentication.getName();
-        Utilisateur user = utilisateurRepository
-                .findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+    String username = authentication.getName();
+    Utilisateur user =
+        utilisateurRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-        Page<Commande> commandes = commandeRepository.findByCreatedBy(user, pageable);
-        return ResponseEntity.ok(commandes);
-    }
+    Page<Commande> commandes = commandeRepository.findByCreatedBy(user, pageable);
+    return ResponseEntity.ok(commandes);
+  }
 
-
-    @PatchMapping("/{id}/statut")
+  @PatchMapping("/{id}/statut")
   @PreAuthorize("hasAnyRole('ADMIN','VENTE')")
   public ResponseEntity<Commande> changerStatut(
       @PathVariable Long id, @RequestParam StatutCommande statut) {

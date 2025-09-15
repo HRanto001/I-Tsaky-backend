@@ -21,6 +21,7 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
   List<Commande> findByStatut(StatutCommande statut);
 
   List<Commande> findByCreatedBy(Utilisateur user);
+
   Page<Commande> findByCreatedBy(Utilisateur user, Pageable pageable);
 
   Page<Commande> findAllByOrderByDateCommandeDesc(Pageable pageable);
