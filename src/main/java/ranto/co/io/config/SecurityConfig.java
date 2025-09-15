@@ -22,23 +22,10 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
-        .cors(
-            cors ->
-                cors.configurationSource(
-                    request -> {
-                      var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                      corsConfig.setAllowedOrigins(
-                          List.of("http://localhost:5173", "https://i-tsaky.vercel.app"));
-                      corsConfig.setAllowedMethods(
-                          List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                      corsConfig.setAllowedHeaders(List.of("*"));
-                      corsConfig.setAllowCredentials(true);
-                      return corsConfig;
-                    }))
+        .cors(Customizer.withDefaults()) // Utilise la configuration globale CORS
         .authorizeHttpRequests(
             auth ->
                 auth
-                    // Permettre le login et le ping sans JWT
                     .requestMatchers("/api/auth/**", "/pingR")
                     .permitAll()
                     .anyRequest()
@@ -48,6 +35,21 @@ public class SecurityConfig {
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  // Configuration CORS globale
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://i-tsaky.vercel.app"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setAllowCredentials(true);
+    configuration.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 
   @Bean
