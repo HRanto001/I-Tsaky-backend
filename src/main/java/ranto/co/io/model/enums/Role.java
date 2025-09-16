@@ -4,5 +4,6 @@ public enum Role {
   ADMIN,
   PRODUCTION,
   VENTE,
+  CLIENT,
   MARKETING
 }
