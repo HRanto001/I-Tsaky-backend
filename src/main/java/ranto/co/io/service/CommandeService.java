@@ -136,54 +136,53 @@ public class CommandeService {
     return commandeRepository.save(commande);
   }
 
-    @Transactional
-    public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
-        Commande commande =
-                commandeRepository
-                        .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
+  @Transactional
+  public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
+    Commande commande =
+        commandeRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
 
-        // Vérifier les transitions possibles
-        switch (commande.getStatut()) {
-            case EN_ATTENTE:
-                if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
-                    throw new RuntimeException("Transition non autorisée");
-                }
-                break;
-            case PAYEE:
-                if (nouveauStatut != StatutCommande.LIVREE) {
-                    throw new RuntimeException("Transition non autorisée");
-                }
-                break;
-            case LIVREE:
-            case ANNULEE:
-                throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
+    // Vérifier les transitions possibles
+    switch (commande.getStatut()) {
+      case EN_ATTENTE:
+        if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
+          throw new RuntimeException("Transition non autorisée");
         }
-
-        // Si la commande est annulée
-        if (nouveauStatut == StatutCommande.ANNULEE) {
-            if (commande.getDetails() != null) {
-                for (CommandeDetail detail : commande.getDetails()) {
-                    // mettre prix total du détail à 0
-                    detail.setPrixTotal(0.0);
-
-                    // remettre la quantité commandée dans le stock
-                    Produit produit = detail.getProduit();
-                    if (produit != null) {
-                        produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
-                        produitRepository.save(produit);
-                    }
-                }
-            }
+        break;
+      case PAYEE:
+        if (nouveauStatut != StatutCommande.LIVREE) {
+          throw new RuntimeException("Transition non autorisée");
         }
-
-        // mettre à jour le statut
-        commande.setStatut(nouveauStatut);
-        return commandeRepository.save(commande);
+        break;
+      case LIVREE:
+      case ANNULEE:
+        throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
     }
 
+    // Si la commande est annulée
+    if (nouveauStatut == StatutCommande.ANNULEE) {
+      if (commande.getDetails() != null) {
+        for (CommandeDetail detail : commande.getDetails()) {
+          // mettre prix total du détail à 0
+          detail.setPrixTotal(0.0);
 
-    public void delete(Long id) {
+          // remettre la quantité commandée dans le stock
+          Produit produit = detail.getProduit();
+          if (produit != null) {
+            produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
+            produitRepository.save(produit);
+          }
+        }
+      }
+    }
+
+    // mettre à jour le statut
+    commande.setStatut(nouveauStatut);
+    return commandeRepository.save(commande);
+  }
+
+  public void delete(Long id) {
     commandeRepository.deleteById(id);
   }
 }
