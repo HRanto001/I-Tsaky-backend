@@ -37,24 +37,36 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
           + "ORDER BY totalVendu DESC")
   List<Object[]> findTopProducts();
 
-  @Query("SELECT COUNT(c) FROM Commande c WHERE c.dateCommande >= :startDate")
-  Long countOrders(@Param("startDate") LocalDateTime startDate);
+    @Query("SELECT COUNT(c) FROM Commande c WHERE c.dateCommande >= :startDate AND c.statut <> 'ANNULEE'")
+    Long countOrders(@Param("startDate") LocalDateTime startDate);
 
-  @Query(
-      "SELECT COALESCE(SUM(d.prixTotal), 0) FROM Commande c JOIN c.details d WHERE c.dateCommande"
-          + " >= :startDate")
-  Double sumRevenue(@Param("startDate") LocalDateTime startDate);
+    @Query(
+            "SELECT COALESCE(SUM(d.prixTotal), 0) " +
+                    "FROM Commande c JOIN c.details d " +
+                    "WHERE c.dateCommande >= :startDate " +
+                    "AND c.statut <> 'ANNULEE'"
+    )
+    Double sumRevenue(@Param("startDate") LocalDateTime startDate);
 
-  @Query(
-      "SELECT new ranto.co.io.endpoint.controller.dto.TopProductDto(d.produit.nom, SUM(d.quantite),"
-          + " SUM(d.prixTotal)) FROM Commande c JOIN c.details d WHERE c.dateCommande >= :startDate"
-          + " GROUP BY d.produit.nom ORDER BY SUM(d.quantite) DESC")
-  List<TopProductDto> findTopProducts(@Param("startDate") LocalDateTime startDate);
+    @Query(
+            "SELECT new ranto.co.io.endpoint.controller.dto.TopProductDto(d.produit.nom, SUM(d.quantite), SUM(d.prixTotal)) " +
+                    "FROM Commande c JOIN c.details d " +
+                    "WHERE c.dateCommande >= :startDate " +
+                    "AND c.statut <> 'ANNULEE' " +
+                    "GROUP BY d.produit.nom " +
+                    "ORDER BY SUM(d.quantite) DESC"
+    )
+    List<TopProductDto> findTopProducts(@Param("startDate") LocalDateTime startDate);
 
   // Somme entre deux dates
   @Query(
-      "SELECT COALESCE(SUM(d.prixTotal), 0) FROM Commande c JOIN c.details d WHERE c.dateCommande"
-          + " >= :startDate AND c.dateCommande <= :endDate")
+          "SELECT COALESCE(SUM(d.prixTotal), 0) " +
+                  "FROM Commande c JOIN c.details d " +
+                  "WHERE c.dateCommande >= :startDate AND c.dateCommande <= :endDate " +
+                  "AND c.statut <> 'ANNULEE'"
+  )
   Double sumRevenueBetween(
-      @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+          @Param("startDate") LocalDateTime startDate,
+          @Param("endDate") LocalDateTime endDate
+  );
 }
