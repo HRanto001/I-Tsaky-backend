@@ -72,9 +72,9 @@ public class CommandeService {
 
       commande.setCreatedBy(existing.getCreatedBy());
 
-        if (existing.getStatut() != StatutCommande.EN_ATTENTE) {
-            commande.setDetails(existing.getDetails()); // garder les anciens détails
-        }
+      if (existing.getStatut() != StatutCommande.EN_ATTENTE) {
+        commande.setDetails(existing.getDetails()); // garder les anciens détails
+      }
 
       if (currentUser != null) {
         commande.setUpdatedBy(currentUser);
@@ -88,43 +88,51 @@ public class CommandeService {
     }
 
     // Vérification et calcul des détails
-      if (commande.getDetails() != null) {
-          for (CommandeDetail detail : commande.getDetails()) {
-              Produit produit = produitRepository.findById(detail.getProduit().getId())
-                      .orElseThrow(() -> new RuntimeException("Produit introuvable : " + detail.getProduit().getId()));
+    if (commande.getDetails() != null) {
+      for (CommandeDetail detail : commande.getDetails()) {
+        Produit produit =
+            produitRepository
+                .findById(detail.getProduit().getId())
+                .orElseThrow(
+                    () ->
+                        new RuntimeException(
+                            "Produit introuvable : " + detail.getProduit().getId()));
 
-              int ancienneQuantite = 0;
-              if (detail.getId() != null) {
-                  // si le détail existe déjà, récupérer l'ancienne quantité
-                  CommandeDetail oldDetail = commandeRepository.findById(commande.getId())
-                          .flatMap(c -> c.getDetails().stream()
-                                  .filter(d -> d.getId().equals(detail.getId()))
-                                  .findFirst())
-                          .orElse(null);
-                  if (oldDetail != null) {
-                      ancienneQuantite = oldDetail.getQuantite();
-                  }
-              }
-
-              int difference = detail.getQuantite() - ancienneQuantite;
-
-              // Vérification du stock
-              if (produit.getStockDisponible() < difference) {
-                  throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
-              }
-
-              // Mise à jour du stock avec la différence
-              produit.setStockDisponible(produit.getStockDisponible() - difference);
-              produitRepository.save(produit);
-
-              // Calcul du prix total
-              detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
-              detail.setCommande(commande);
+        int ancienneQuantite = 0;
+        if (detail.getId() != null) {
+          // si le détail existe déjà, récupérer l'ancienne quantité
+          CommandeDetail oldDetail =
+              commandeRepository
+                  .findById(commande.getId())
+                  .flatMap(
+                      c ->
+                          c.getDetails().stream()
+                              .filter(d -> d.getId().equals(detail.getId()))
+                              .findFirst())
+                  .orElse(null);
+          if (oldDetail != null) {
+            ancienneQuantite = oldDetail.getQuantite();
           }
+        }
+
+        int difference = detail.getQuantite() - ancienneQuantite;
+
+        // Vérification du stock
+        if (produit.getStockDisponible() < difference) {
+          throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
+        }
+
+        // Mise à jour du stock avec la différence
+        produit.setStockDisponible(produit.getStockDisponible() - difference);
+        produitRepository.save(produit);
+
+        // Calcul du prix total
+        detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
+        detail.setCommande(commande);
       }
+    }
 
-
-      return commandeRepository.save(commande);
+    return commandeRepository.save(commande);
   }
 
   public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
@@ -142,50 +150,51 @@ public class CommandeService {
     return commandeRepository.save(commande);
   }
 
-    @Transactional
-    public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
-        Commande commande = commandeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
+  @Transactional
+  public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
+    Commande commande =
+        commandeRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
 
-        switch (commande.getStatut()) {
-            case EN_ATTENTE:
-                if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE) {
-                    throw new RuntimeException("Transition non autorisée depuis EN_ATTENTE");
-                }
-                break;
-            case ACCEPTE:
-                if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
-                    throw new RuntimeException("Transition non autorisée depuis ACCEPTEE");
-                }
-                break;
-            case PAYEE:
-                if (nouveauStatut != StatutCommande.LIVREE) {
-                    throw new RuntimeException("Transition non autorisée depuis PAYEE");
-                }
-                break;
-            case LIVREE:
-            case ANNULEE:
-                throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
+    switch (commande.getStatut()) {
+      case EN_ATTENTE:
+        if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE) {
+          throw new RuntimeException("Transition non autorisée depuis EN_ATTENTE");
         }
-
-        // Si la commande est annulée → restituer le stock
-        if (nouveauStatut == StatutCommande.ANNULEE && commande.getDetails() != null) {
-            for (CommandeDetail detail : commande.getDetails()) {
-                detail.setPrixTotal(0.0);
-                Produit produit = detail.getProduit();
-                if (produit != null) {
-                    produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
-                    produitRepository.save(produit);
-                }
-            }
+        break;
+      case ACCEPTE:
+        if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
+          throw new RuntimeException("Transition non autorisée depuis ACCEPTEE");
         }
-
-        commande.setStatut(nouveauStatut);
-        return commandeRepository.save(commande);
+        break;
+      case PAYEE:
+        if (nouveauStatut != StatutCommande.LIVREE) {
+          throw new RuntimeException("Transition non autorisée depuis PAYEE");
+        }
+        break;
+      case LIVREE:
+      case ANNULEE:
+        throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
     }
 
+    // Si la commande est annulée → restituer le stock
+    if (nouveauStatut == StatutCommande.ANNULEE && commande.getDetails() != null) {
+      for (CommandeDetail detail : commande.getDetails()) {
+        detail.setPrixTotal(0.0);
+        Produit produit = detail.getProduit();
+        if (produit != null) {
+          produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
+          produitRepository.save(produit);
+        }
+      }
+    }
 
-    public void delete(Long id) {
+    commande.setStatut(nouveauStatut);
+    return commandeRepository.save(commande);
+  }
+
+  public void delete(Long id) {
     commandeRepository.deleteById(id);
   }
 }
