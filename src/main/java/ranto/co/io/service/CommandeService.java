@@ -72,6 +72,10 @@ public class CommandeService {
 
       commande.setCreatedBy(existing.getCreatedBy());
 
+        if (existing.getStatut() != StatutCommande.EN_ATTENTE) {
+            commande.setDetails(existing.getDetails()); // garder les anciens détails
+        }
+
       if (currentUser != null) {
         commande.setUpdatedBy(currentUser);
       }
@@ -136,53 +140,50 @@ public class CommandeService {
     return commandeRepository.save(commande);
   }
 
-  @Transactional
-  public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
-    Commande commande =
-        commandeRepository
-            .findById(id)
-            .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
+    @Transactional
+    public Commande updateStatut(Long id, StatutCommande nouveauStatut) {
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Commande non trouvée"));
 
-    // Vérifier les transitions possibles
-    switch (commande.getStatut()) {
-      case EN_ATTENTE:
-        if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
-          throw new RuntimeException("Transition non autorisée");
+        switch (commande.getStatut()) {
+            case EN_ATTENTE:
+                if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE) {
+                    throw new RuntimeException("Transition non autorisée depuis EN_ATTENTE");
+                }
+                break;
+            case ACCEPTE:
+                if (nouveauStatut != StatutCommande.PAYEE && nouveauStatut != StatutCommande.ANNULEE) {
+                    throw new RuntimeException("Transition non autorisée depuis ACCEPTEE");
+                }
+                break;
+            case PAYEE:
+                if (nouveauStatut != StatutCommande.LIVREE) {
+                    throw new RuntimeException("Transition non autorisée depuis PAYEE");
+                }
+                break;
+            case LIVREE:
+            case ANNULEE:
+                throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
         }
-        break;
-      case PAYEE:
-        if (nouveauStatut != StatutCommande.LIVREE) {
-          throw new RuntimeException("Transition non autorisée");
+
+        // Si la commande est annulée → restituer le stock
+        if (nouveauStatut == StatutCommande.ANNULEE && commande.getDetails() != null) {
+            for (CommandeDetail detail : commande.getDetails()) {
+                detail.setPrixTotal(0.0);
+                Produit produit = detail.getProduit();
+                if (produit != null) {
+                    produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
+                    produitRepository.save(produit);
+                }
+            }
         }
-        break;
-      case LIVREE:
-      case ANNULEE:
-        throw new RuntimeException("Impossible de modifier une commande livrée ou annulée");
+
+        commande.setStatut(nouveauStatut);
+        return commandeRepository.save(commande);
     }
 
-    // Si la commande est annulée
-    if (nouveauStatut == StatutCommande.ANNULEE) {
-      if (commande.getDetails() != null) {
-        for (CommandeDetail detail : commande.getDetails()) {
-          // mettre prix total du détail à 0
-          detail.setPrixTotal(0.0);
 
-          // remettre la quantité commandée dans le stock
-          Produit produit = detail.getProduit();
-          if (produit != null) {
-            produit.setStockDisponible(produit.getStockDisponible() + detail.getQuantite());
-            produitRepository.save(produit);
-          }
-        }
-      }
-    }
-
-    // mettre à jour le statut
-    commande.setStatut(nouveauStatut);
-    return commandeRepository.save(commande);
-  }
-
-  public void delete(Long id) {
+    public void delete(Long id) {
     commandeRepository.deleteById(id);
   }
 }
