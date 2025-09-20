@@ -159,7 +159,8 @@ public class CommandeService {
 
     switch (commande.getStatut()) {
       case EN_ATTENTE:
-        if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE) {
+        if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE && nouveauStatut != StatutCommande.PAYEE) {
+
           throw new RuntimeException("Transition non autorisée depuis EN_ATTENTE");
         }
         break;
