@@ -88,41 +88,43 @@ public class CommandeService {
     }
 
     // Vérification et calcul des détails
-    if (commande.getDetails() != null) {
-      for (CommandeDetail detail : commande.getDetails()) {
-        if (detail.getProduit() == null || detail.getProduit().getId() == null) {
-          throw new RuntimeException("Produit manquant dans le détail de commande");
-        }
+      if (commande.getDetails() != null) {
+          for (CommandeDetail detail : commande.getDetails()) {
+              Produit produit = produitRepository.findById(detail.getProduit().getId())
+                      .orElseThrow(() -> new RuntimeException("Produit introuvable : " + detail.getProduit().getId()));
 
-        Produit produit =
-            produitRepository
-                .findById(detail.getProduit().getId())
-                .orElseThrow(
-                    () ->
-                        new RuntimeException(
-                            "Produit introuvable : " + detail.getProduit().getId()));
+              int ancienneQuantite = 0;
+              if (detail.getId() != null) {
+                  // si le détail existe déjà, récupérer l'ancienne quantité
+                  CommandeDetail oldDetail = commandeRepository.findById(commande.getId())
+                          .flatMap(c -> c.getDetails().stream()
+                                  .filter(d -> d.getId().equals(detail.getId()))
+                                  .findFirst())
+                          .orElse(null);
+                  if (oldDetail != null) {
+                      ancienneQuantite = oldDetail.getQuantite();
+                  }
+              }
 
-        if (produit.getPrixUnitaire() == null) {
-          throw new RuntimeException(
-              "Le produit " + produit.getNom() + " n'a pas de prix unitaire défini");
-        }
+              int difference = detail.getQuantite() - ancienneQuantite;
 
-        // Vérification du stock disponible
-        if (produit.getStockDisponible() < detail.getQuantite()) {
-          throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
-        }
+              // Vérification du stock
+              if (produit.getStockDisponible() < difference) {
+                  throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
+              }
 
-        // Décrémenter le stock
-        produit.setStockDisponible(produit.getStockDisponible() - detail.getQuantite());
-        produitRepository.save(produit);
+              // Mise à jour du stock avec la différence
+              produit.setStockDisponible(produit.getStockDisponible() - difference);
+              produitRepository.save(produit);
 
-        // Calcul du prix total pour le détail
-        detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
-        detail.setCommande(commande);
+              // Calcul du prix total
+              detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
+              detail.setCommande(commande);
+          }
       }
-    }
 
-    return commandeRepository.save(commande);
+
+      return commandeRepository.save(commande);
   }
 
   public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
