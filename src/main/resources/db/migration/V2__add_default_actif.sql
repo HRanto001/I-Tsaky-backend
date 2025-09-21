@@ -1,0 +1,6 @@
+ALTER TABLE utilisateurs
+    ALTER COLUMN actif SET DEFAULT false;
+
+UPDATE utilisateurs
+SET actif = false
+WHERE actif IS NULL;
