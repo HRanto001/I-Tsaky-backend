@@ -63,4 +63,6 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
           + "AND c.statut <> 'ANNULEE'")
   Double sumRevenueBetween(
       @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    long countByCreatedBy(Utilisateur user);
 }
