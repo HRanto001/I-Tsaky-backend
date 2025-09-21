@@ -1,8 +1,8 @@
-CREATE TABLE utilisateurs if not exist(
-                              id SERIAL PRIMARY KEY,
-                              nom VARCHAR(100) NOT NULL,
-                              prenom VARCHAR(100),
-                              role VARCHAR(50) CHECK (role IN ('Admin', 'Production', 'Vente', 'Marketing')),
-                              email VARCHAR(150) UNIQUE,
-                              mot_de_passe VARCHAR(255) NOT NULL
-);
+-- CREATE TABLE utilisateurs if not exist(
+--                               id SERIAL PRIMARY KEY,
+--                               nom VARCHAR(100) NOT NULL,
+--                               prenom VARCHAR(100),
+--                               role VARCHAR(50) CHECK (role IN ('Admin', 'Production', 'Vente', 'Marketing')),
+--                               email VARCHAR(150) UNIQUE,
+--                               mot_de_passe VARCHAR(255) NOT NULL
+-- );

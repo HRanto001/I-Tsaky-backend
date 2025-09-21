@@ -15,6 +15,6 @@
   @Override
   public void run(String... args) {
     // Exemple : clé fixe valable 7 jours
-    activationKeyService.createKey("ABC123XYZ", 1);
+    activationKeyService.createKey("ABC123XYZ", 7);
   }
  }

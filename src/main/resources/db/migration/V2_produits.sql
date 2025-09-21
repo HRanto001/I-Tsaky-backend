@@ -1,8 +1,8 @@
-CREATE TABLE produits if not exist(
-                          id SERIAL PRIMARY KEY,
-                          nom VARCHAR(150) NOT NULL,
-                          description TEXT,
-                          prix_unitaire NUMERIC(12,2) NOT NULL,
-                          categorie VARCHAR(50) CHECK (categorie IN ('Snack', 'Chips', 'Boisson', 'Autre')),
-                          stock_disponible INT DEFAULT 0
-);
+-- CREATE TABLE produits if not exist(
+--                           id SERIAL PRIMARY KEY,
+--                           nom VARCHAR(150) NOT NULL,
+--                           description TEXT,
+--                           prix_unitaire NUMERIC(12,2) NOT NULL,
+--                           categorie VARCHAR(50) CHECK (categorie IN ('Snack', 'Chips', 'Boisson', 'Autre')),
+--                           stock_disponible INT DEFAULT 0
+-- );

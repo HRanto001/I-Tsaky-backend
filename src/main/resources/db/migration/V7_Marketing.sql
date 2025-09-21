@@ -1,7 +1,7 @@
-CREATE TABLE marketing if not exist(
-                           id SERIAL PRIMARY KEY,
-                           canal VARCHAR(100) CHECK (canal IN ('Facebook', 'Site Web', 'Marché local', 'Partenariat', 'Autre')),
-                           cout NUMERIC(12,2),
-                           date_action DATE DEFAULT CURRENT_DATE,
-                           description TEXT
-);
+-- CREATE TABLE marketing if not exist(
+--                            id SERIAL PRIMARY KEY,
+--                            canal VARCHAR(100) CHECK (canal IN ('Facebook', 'Site Web', 'Marché local', 'Partenariat', 'Autre')),
+--                            cout NUMERIC(12,2),
+--                            date_action DATE DEFAULT CURRENT_DATE,
+--                            description TEXT
+-- );
