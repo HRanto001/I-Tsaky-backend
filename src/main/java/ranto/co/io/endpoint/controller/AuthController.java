@@ -81,9 +81,11 @@ public class AuthController {
   @GetMapping("/me")
   public ResponseEntity<?> me(
       @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       return ResponseEntity.status(401).body(Map.of("error", "Token manquant ou invalide"));
     }
+
     String token = authHeader.substring(7);
 
     if (!jwtUtil.validateToken(token)) {
@@ -100,8 +102,10 @@ public class AuthController {
                     Map.of(
                         "id", user.getId(),
                         "nom", user.getNom(),
+                        "prenom", user.getPrenom(),
                         "email", user.getEmail(),
-                        "role", user.getRole())))
+                        "role", user.getRole(),
+                        "actif", user.getActif())))
         .orElse(ResponseEntity.status(404).body(Map.of("error", "Utilisateur non trouvé")));
   }
 

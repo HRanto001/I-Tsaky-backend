@@ -13,22 +13,22 @@ import ranto.co.io.model.enums.Role;
 @Builder
 public class Utilisateur {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String nom;
-    private String prenom;
+  private String nom;
+  private String prenom;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+  @Column(unique = true, nullable = false)
+  private String email;
 
-    @Column(nullable = false)
-    private String motDePasse;
+  @Column(nullable = false)
+  private String motDePasse;
 
-    @Column(nullable = false)
-    private Boolean actif = false;
+  @Column(nullable = false)
+  private Boolean actif = false;
 }

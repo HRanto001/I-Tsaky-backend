@@ -64,5 +64,5 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
   Double sumRevenueBetween(
       @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    long countByCreatedBy(Utilisateur user);
+  long countByCreatedBy(Utilisateur user);
 }

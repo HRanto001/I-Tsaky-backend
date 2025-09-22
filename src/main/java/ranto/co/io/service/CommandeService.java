@@ -81,7 +81,7 @@ public class CommandeService {
             if (currentUser != null) {
                 commande.setCreatedBy(currentUser);
 
-                // Activer l'utilisateur une seule fois ici
+                // 🔥 Activer l'utilisateur une seule fois ici
                 if (Boolean.FALSE.equals(currentUser.getActif())) {
                     currentUser.setActif(true);
                     utilisateurRepository.save(currentUser);
@@ -127,8 +127,7 @@ public class CommandeService {
         return commandeRepository.save(commande);
     }
 
-
-  public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
+    public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
     Commande commande =
         commandeRepository
             .findById(commandeId)
@@ -152,7 +151,9 @@ public class CommandeService {
 
     switch (commande.getStatut()) {
       case EN_ATTENTE:
-        if (nouveauStatut != StatutCommande.ACCEPTE && nouveauStatut != StatutCommande.ANNULEE && nouveauStatut != StatutCommande.PAYEE) {
+        if (nouveauStatut != StatutCommande.ACCEPTE
+            && nouveauStatut != StatutCommande.ANNULEE
+            && nouveauStatut != StatutCommande.PAYEE) {
 
           throw new RuntimeException("Transition non autorisée depuis EN_ATTENTE");
         }
@@ -188,20 +189,21 @@ public class CommandeService {
     return commandeRepository.save(commande);
   }
 
-    public void delete(Long id) {
-        Commande commande = commandeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Commande introuvable"));
+  public void delete(Long id) {
+    Commande commande =
+        commandeRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Commande introuvable"));
 
-        Utilisateur user = commande.getCreatedBy();
+    Utilisateur user = commande.getCreatedBy();
 
-        commandeRepository.deleteById(id);
+    commandeRepository.deleteById(id);
 
-        // Vérifie si l'utilisateur n'a plus de commande
-        long count = commandeRepository.countByCreatedBy(user);
-        if (count == 0 && Boolean.TRUE.equals(user.getActif())) {
-            user.setActif(false);
-            utilisateurRepository.save(user);
-        }
+    // Vérifie si l'utilisateur n'a plus de commande
+    long count = commandeRepository.countByCreatedBy(user);
+    if (count == 0 && Boolean.TRUE.equals(user.getActif())) {
+      user.setActif(false);
+      utilisateurRepository.save(user);
     }
-
+  }
 }
