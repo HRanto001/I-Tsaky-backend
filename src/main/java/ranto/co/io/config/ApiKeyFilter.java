@@ -12,10 +12,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-@Order(0) // s'exécute avant JwtFilter
+@Order(0)
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    @Value("${app.api.key}") // injectée depuis application.properties
+    @Value("${app.api.key}")
     private String validApiKey;
 
     private static final String API_KEY_HEADER = "X-API-KEY";
@@ -29,8 +29,9 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Vérifie uniquement pour /api/auth/? et /pingR
-        if (path.equals("/api/auth/register")
+        if (path.startsWith("/api/auth/register")
                 || path.equals("/api/auth/login")
+                || path.equals("/api/auth/reset-password")
                 || path.equals("/pingR")) {
             String apiKey = request.getHeader(API_KEY_HEADER);
 
