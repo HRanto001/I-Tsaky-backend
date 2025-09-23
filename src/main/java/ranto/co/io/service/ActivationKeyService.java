@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
+import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ranto.co.io.model.ActivationKey;
 import ranto.co.io.repository.ActivationKeyRepository;
@@ -53,23 +56,33 @@ public class ActivationKeyService {
     return activationKeyRepository.save(key);
   }
 
-  // Vérification et consommation
-  public boolean useKey(String keyValue) {
-    return activationKeyRepository
-        .findByKeyValue(keyValue)
-        .filter(key -> !key.isUsed())
-        .filter(
-            key -> key.getExpiresAt() == null || key.getExpiresAt().isAfter(LocalDateTime.now()))
-        .map(
-            key -> {
-              key.setUsed(true); // marquer comme utilisé
-              activationKeyRepository.save(key);
-              return true;
-            })
-        .orElse(false);
-  }
+    // Vérification et consommation
+    public boolean useKey(String keyValue) {
+        return activationKeyRepository
+                .findByKeyValue(keyValue)
+                .map(key -> {
+                    // Si déjà utilisée
+                    if (key.isUsed()) {
+                        return false;
+                    }
 
-  public boolean validateKeyForReset(String keyValue) {
+                    // Vérifier expiration
+                    if (key.getExpiresAt() != null && key.getExpiresAt().isBefore(LocalDateTime.now())) {
+                        key.setUsed(true); // marquer comme utilisée car expirée
+                        activationKeyRepository.save(key);
+                        return false; // car on ne peut pas l'utiliser
+                    }
+
+                    // Sinon marquer comme utilisée normalement
+                    key.setUsed(true);
+                    activationKeyRepository.save(key);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+
+    public boolean validateKeyForReset(String keyValue) {
     return activationKeyRepository
         .findByKeyValue(keyValue)
         .filter(
@@ -84,4 +97,13 @@ public class ActivationKeyService {
   public ActivationKey save(ActivationKey key) {
     return activationKeyRepository.save(key);
   }
+
+    @Scheduled(cron = "0 0 0 * * *") // tous les jours à minuit
+    @Transactional
+    public void markExpiredKeysAsUsed() {
+        int updated = activationKeyRepository.markExpiredKeysAsUsed(LocalDateTime.now());
+        if (updated > 0) {
+            System.out.println("⚡ " + updated + " clés expirées ont été marquées comme utilisées.");
+        }
+    }
 }
