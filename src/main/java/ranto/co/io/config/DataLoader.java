@@ -1,13 +1,13 @@
-//package ranto.co.io.config;
+// package ranto.co.io.config;
 //
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.boot.CommandLineRunner;
-//import org.springframework.stereotype.Component;
-//import ranto.co.io.service.ActivationKeyService;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.stereotype.Component;
+// import ranto.co.io.service.ActivationKeyService;
 //
-//@Component
-//@RequiredArgsConstructor
-//public class DataLoader implements CommandLineRunner {
+// @Component
+// @RequiredArgsConstructor
+// public class DataLoader implements CommandLineRunner {
 //
 //  private final ActivationKeyService activationKeyService;
 //
@@ -16,4 +16,4 @@
 //    // Exemple : clé fixe valable 7 jours
 //    activationKeyService.createKey("ABC123XYZ", 7);
 //  }
-//}
+// }

@@ -50,84 +50,96 @@ public class CommandeService {
     return commandeRepository.findByCreatedByOrderByDateCommandeDesc(user, pageable);
   }
 
-    public Commande save(Commande commande) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Utilisateur currentUser = null;
+  public Commande save(Commande commande) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    Utilisateur currentUser = null;
 
-        if (auth != null && auth.isAuthenticated()) {
-            String username = auth.getName();
-            currentUser = utilisateurRepository
-                    .findByEmail(username)
-                    .orElseThrow(() -> new RuntimeException("Utilisateur introuvable: " + username));
-        }
-
-        if (commande.getId() != null) {
-            // Mise à jour
-            Commande existing = commandeRepository.findById(commande.getId())
-                    .orElseThrow(() -> new RuntimeException("Commande introuvable"));
-
-            commande.setCreatedBy(existing.getCreatedBy());
-
-            if (existing.getStatut() != StatutCommande.EN_ATTENTE) {
-                commande.setDetails(existing.getDetails()); // garder les anciens détails
-            }
-
-            if (currentUser != null) {
-                commande.setUpdatedBy(currentUser);
-            }
-        } else {
-            // Création
-            commande.setDateCommande(LocalDateTime.now());
-            if (currentUser != null) {
-                commande.setCreatedBy(currentUser);
-
-                // 🔥 Activer l'utilisateur une seule fois ici
-                if (Boolean.FALSE.equals(currentUser.getActif())) {
-                    currentUser.setActif(true);
-                    utilisateurRepository.save(currentUser);
-                }
-            }
-        }
-
-        // Vérification et calcul des détails
-        if (commande.getDetails() != null) {
-            for (CommandeDetail detail : commande.getDetails()) {
-                Produit produit = produitRepository.findById(detail.getProduit().getId())
-                        .orElseThrow(() -> new RuntimeException("Produit introuvable : " + detail.getProduit().getId()));
-
-                int ancienneQuantite = 0;
-                if (detail.getId() != null) {
-                    CommandeDetail oldDetail = commandeRepository.findById(commande.getId())
-                            .flatMap(c -> c.getDetails().stream()
-                                    .filter(d -> d.getId().equals(detail.getId()))
-                                    .findFirst())
-                            .orElse(null);
-                    if (oldDetail != null) {
-                        ancienneQuantite = oldDetail.getQuantite();
-                    }
-                }
-
-                int difference = detail.getQuantite() - ancienneQuantite;
-
-                // Vérifier le stock uniquement si on augmente la quantité
-                if (difference > 0 && produit.getStockDisponible() < difference) {
-                    throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
-                }
-
-                // Mise à jour du stock
-                produit.setStockDisponible(produit.getStockDisponible() - difference);
-                produitRepository.save(produit);
-
-                // Prix total
-                detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
-                detail.setCommande(commande);
-            }
-        }
-
-        return commandeRepository.save(commande);
+    if (auth != null && auth.isAuthenticated()) {
+      String username = auth.getName();
+      currentUser =
+          utilisateurRepository
+              .findByEmail(username)
+              .orElseThrow(() -> new RuntimeException("Utilisateur introuvable: " + username));
     }
 
-    public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
+    if (commande.getId() != null) {
+      // Mise à jour
+      Commande existing =
+          commandeRepository
+              .findById(commande.getId())
+              .orElseThrow(() -> new RuntimeException("Commande introuvable"));
+
+      commande.setCreatedBy(existing.getCreatedBy());
+
+      if (existing.getStatut() != StatutCommande.EN_ATTENTE) {
+        commande.setDetails(existing.getDetails()); // garder les anciens détails
+      }
+
+      if (currentUser != null) {
+        commande.setUpdatedBy(currentUser);
+      }
+    } else {
+      // Création
+      commande.setDateCommande(LocalDateTime.now());
+      if (currentUser != null) {
+        commande.setCreatedBy(currentUser);
+
+        // 🔥 Activer l'utilisateur une seule fois ici
+        if (Boolean.FALSE.equals(currentUser.getActif())) {
+          currentUser.setActif(true);
+          utilisateurRepository.save(currentUser);
+        }
+      }
+    }
+
+    // Vérification et calcul des détails
+    if (commande.getDetails() != null) {
+      for (CommandeDetail detail : commande.getDetails()) {
+        Produit produit =
+            produitRepository
+                .findById(detail.getProduit().getId())
+                .orElseThrow(
+                    () ->
+                        new RuntimeException(
+                            "Produit introuvable : " + detail.getProduit().getId()));
+
+        int ancienneQuantite = 0;
+        if (detail.getId() != null) {
+          CommandeDetail oldDetail =
+              commandeRepository
+                  .findById(commande.getId())
+                  .flatMap(
+                      c ->
+                          c.getDetails().stream()
+                              .filter(d -> d.getId().equals(detail.getId()))
+                              .findFirst())
+                  .orElse(null);
+          if (oldDetail != null) {
+            ancienneQuantite = oldDetail.getQuantite();
+          }
+        }
+
+        int difference = detail.getQuantite() - ancienneQuantite;
+
+        // Vérifier le stock uniquement si on augmente la quantité
+        if (difference > 0 && produit.getStockDisponible() < difference) {
+          throw new RuntimeException("Stock insuffisant pour le produit : " + produit.getNom());
+        }
+
+        // Mise à jour du stock
+        produit.setStockDisponible(produit.getStockDisponible() - difference);
+        produitRepository.save(produit);
+
+        // Prix total
+        detail.setPrixTotal(detail.getQuantite() * produit.getPrixUnitaire());
+        detail.setCommande(commande);
+      }
+    }
+
+    return commandeRepository.save(commande);
+  }
+
+  public Commande changerStatut(Long commandeId, StatutCommande nouveauStatut) {
     Commande commande =
         commandeRepository
             .findById(commandeId)
