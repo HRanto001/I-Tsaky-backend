@@ -35,4 +35,13 @@ public class ProduitService {
   public void delete(Long id) {
     produitRepository.deleteById(id);
   }
+
+    public Produit updateImage(Long id, byte[] imageData, String imageType) {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
+        produit.setImageData(imageData);
+        produit.setImageType(imageType);
+        return produitRepository.save(produit);
+    }
+
 }

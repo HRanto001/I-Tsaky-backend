@@ -24,6 +24,13 @@ public class Produit {
   @Enumerated(EnumType.STRING)
   private CategorieProduit categorie;
 
-  @Column(name = "stock_disponible")
+  @Lob
+  @Column(name = "image_data")
+  private byte[] imageData;
+
+  @Column(name = "image_type")
+  private String imageType;
+
+    @Column(name = "stock_disponible")
   private Integer stockDisponible;
 }
