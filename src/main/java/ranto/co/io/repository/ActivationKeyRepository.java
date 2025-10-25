@@ -23,4 +23,6 @@ public interface ActivationKeyRepository extends JpaRepository<ActivationKey, Lo
     int markExpiredKeysAsUsed(LocalDateTime now);
 
   void deleteByExpiresAtBefore(LocalDateTime dateTime);
+
+    boolean existsByKeyValue(String keyValue);
 }
