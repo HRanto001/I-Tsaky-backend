@@ -41,7 +41,7 @@ public class DataLoader implements CommandLineRunner {
 
   /** Crée un utilisateur admin par défaut s’il n’existe pas encore */
   private void createDefaultAdminIfNotExists() {
-    String defaultEmail = "hei.ranto.2@gmail.com";
+    String defaultEmail = "admin-etsako@gmail.com";
 
     boolean exists = utilisateurRepository.existsByEmail(defaultEmail);
 
@@ -51,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
               .nom("Admin")
               .prenom("Etsako")
               .email(defaultEmail)
-              .motDePasse(passwordEncoder.encode("admin123"))
+              .motDePasse(passwordEncoder.encode("Admin123"))
               .role(Role.ADMIN)
               .actif(true)
               .build();
