@@ -34,7 +34,9 @@ public class SecurityConfig {
                         "/api/auth/register",
                         "/api/emails/send",
                         "/pingR",
-                        "/api/auth/reset-password")
+                        "/api/auth/reset-password",
+                        "/api/auth/request-activation-key",
+                        "/api/auth/request-reset-password")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
