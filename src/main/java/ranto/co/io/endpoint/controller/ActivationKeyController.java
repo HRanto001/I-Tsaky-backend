@@ -20,20 +20,27 @@ public class ActivationKeyController {
     this.activationKeyRepository = activationKeyRepository;
   }
 
-  // Récupérer toutes les clés
   @GetMapping
   public List<ActivationKey> getAllKeys() {
     return activationKeyService.getAllKeys();
   }
 
-  // Générer une nouvelle clé
   @PostMapping("/generate")
   public ActivationKey generateKey() {
     return activationKeyService.generateKey();
   }
 
-  // Consommer une clé (utilisée lors du register user)
-  @PostMapping("/use/{key}")
+  @PostMapping("/generate-and-send")
+    public ActivationKey generateAndSend(@RequestParam String email) {
+        return activationKeyService.generateAndSendActivationKey(email);
+    }
+
+  @PostMapping("/generate-reset")
+    public ActivationKey generateResetKey(@RequestParam String email) {
+        return activationKeyService.generateAndSendResetKey(email);
+    }
+
+    @PostMapping("/use/{key}")
   public boolean useKey(@PathVariable String key) {
     return activationKeyService.useKey(key);
   }
