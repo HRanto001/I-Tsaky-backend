@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -106,24 +104,25 @@ public class ActivationKeyService {
       System.out.println("⚡ " + updated + " clés expirées ont été marquées comme utilisées.");
     }
   }
-    public ActivationKey generateAndSendActivationKey(String email) {
 
-        ActivationKey key = generateKey();
+  public ActivationKey generateAndSendActivationKey(String email) {
 
-        emailTemplateService.sendAccountActivationEmail(email, key.getKeyValue());
+    ActivationKey key = generateKey();
 
-        return key;
-    }
+    emailTemplateService.sendAccountActivationEmail(email, key.getKeyValue());
 
-    public ActivationKey generateAndSendResetKey(String email) {
+    return key;
+  }
 
-        ActivationKey key = generateKey();
+  public ActivationKey generateAndSendResetKey(String email) {
 
-        key.setExpiresAt(LocalDateTime.now().plusMinutes(15));
-        activationKeyRepository.save(key);
+    ActivationKey key = generateKey();
 
-        emailTemplateService.sendPasswordResetEmail(email, key.getKeyValue());
+    key.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+    activationKeyRepository.save(key);
 
-        return key;
-    }
+    emailTemplateService.sendPasswordResetEmail(email, key.getKeyValue());
+
+    return key;
+  }
 }

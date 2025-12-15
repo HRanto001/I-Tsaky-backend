@@ -31,16 +31,16 @@ public class ActivationKeyController {
   }
 
   @PostMapping("/generate-and-send")
-    public ActivationKey generateAndSend(@RequestParam String email) {
-        return activationKeyService.generateAndSendActivationKey(email);
-    }
+  public ActivationKey generateAndSend(@RequestParam String email) {
+    return activationKeyService.generateAndSendActivationKey(email);
+  }
 
   @PostMapping("/generate-reset")
-    public ActivationKey generateResetKey(@RequestParam String email) {
-        return activationKeyService.generateAndSendResetKey(email);
-    }
+  public ActivationKey generateResetKey(@RequestParam String email) {
+    return activationKeyService.generateAndSendResetKey(email);
+  }
 
-    @PostMapping("/use/{key}")
+  @PostMapping("/use/{key}")
   public boolean useKey(@PathVariable String key) {
     return activationKeyService.useKey(key);
   }

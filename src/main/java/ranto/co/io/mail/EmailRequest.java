@@ -8,9 +8,9 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class EmailRequest {
-    @NotBlank @Email private String to;
+  @NotBlank @Email private String to;
 
-    @NotBlank private String subject;
+  @NotBlank private String subject;
 
-    @NotBlank private String body;
+  @NotBlank private String body;
 }
