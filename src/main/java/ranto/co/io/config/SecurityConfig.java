@@ -32,6 +32,7 @@ public class SecurityConfig {
                 auth.requestMatchers(
                         "/api/auth/login",
                         "/api/auth/register",
+                        "/api/emails/send",
                         "/pingR",
                         "/api/auth/reset-password")
                     .permitAll()
