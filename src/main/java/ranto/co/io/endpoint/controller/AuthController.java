@@ -169,4 +169,21 @@ public class AuthController {
                 Map.of("message", "Clé d’activation envoyée par email"));
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestParam String email) {
+
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Email requis"));
+        }
+
+        boolean exists = utilisateurRepository.existsByEmail(email);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "email", email,
+                        "exists", exists
+                )
+        );
+    }
 }
