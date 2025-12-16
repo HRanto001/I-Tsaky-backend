@@ -1,1 +1,1 @@
-# poja-starter-template
+# java application 
