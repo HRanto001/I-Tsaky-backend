@@ -12,11 +12,11 @@ import ranto.co.io.service.EmailService;
 @RequiredArgsConstructor
 public class EmailController {
 
-    private final EmailService emailService;
+  private final EmailService emailService;
 
-    @PostMapping("/send")
-    public ResponseEntity<String> sendEmail(@Valid @RequestBody EmailRequest request) {
-        emailService.envoyerEmail(request);
-        return ResponseEntity.ok("Email traité (voir statut en base) !");
-    }
+  @PostMapping("/send")
+  public ResponseEntity<String> sendEmail(@Valid @RequestBody EmailRequest request) {
+    emailService.envoyerEmail(request);
+    return ResponseEntity.ok("Email traité (voir statut en base) !");
+  }
 }
