@@ -27,9 +27,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     String path = request.getRequestURI();
 
     // Vérifie uniquement pour /api/auth/? et /pingR
-    if (path.startsWith("/api/auth/register")
-        || path.equals("/api/auth/login")
-        || path.equals("/api/auth/reset-password")
+    if (path.startsWith("/api/auth/")
         || path.equals("/pingR")) {
       String apiKey = request.getHeader(API_KEY_HEADER);
 
