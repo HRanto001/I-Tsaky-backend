@@ -36,12 +36,13 @@ public class ProduitService {
     produitRepository.deleteById(id);
   }
 
-    public Produit updateImage(Long id, byte[] imageData, String imageType) {
-        Produit produit = produitRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
-        produit.setImageData(imageData);
-        produit.setImageType(imageType);
-        return produitRepository.save(produit);
-    }
-
+  public Produit updateImage(Long id, byte[] imageData, String imageType) {
+    Produit produit =
+        produitRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
+    produit.setImageData(imageData);
+    produit.setImageType(imageType);
+    return produitRepository.save(produit);
+  }
 }

@@ -31,6 +31,6 @@ public class Produit {
   @Column(name = "image_type")
   private String imageType;
 
-    @Column(name = "stock_disponible")
+  @Column(name = "stock_disponible")
   private Integer stockDisponible;
 }

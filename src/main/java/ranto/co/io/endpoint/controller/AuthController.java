@@ -150,4 +150,35 @@ public class AuthController {
             })
         .orElse(ResponseEntity.status(404).body(Map.of("error", "Utilisateur introuvable")));
   }
+
+  @PostMapping("/request-reset-password")
+  public ResponseEntity<?> requestReset(@RequestParam String email) {
+
+    activationKeyService.generateAndSendResetKey(email);
+
+    return ResponseEntity.ok(Map.of("message", "Code de réinitialisation envoyé par email"));
+  }
+
+  @PostMapping("/request-activation-key")
+  public ResponseEntity<?> requestActivationKey(@RequestParam String email) {
+
+    activationKeyService.generateAndSendActivationKey(email);
+
+    return ResponseEntity.ok(Map.of("message", "Clé d’activation envoyée par email"));
+  }
+
+  @GetMapping("/check-email")
+  public ResponseEntity<?> checkEmail(@RequestParam String email) {
+
+    if (email == null || email.isBlank()) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Email requis"));
+    }
+
+    boolean exists = utilisateurRepository.existsByEmail(email);
+
+    return ResponseEntity.ok(
+        Map.of(
+            "email", email,
+            "exists", exists));
+  }
 }

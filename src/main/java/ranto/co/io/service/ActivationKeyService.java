@@ -5,19 +5,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ranto.co.io.model.ActivationKey;
 import ranto.co.io.repository.ActivationKeyRepository;
 
+@AllArgsConstructor
 @Service
 public class ActivationKeyService {
 
   private final ActivationKeyRepository activationKeyRepository;
-
-  public ActivationKeyService(ActivationKeyRepository activationKeyRepository) {
-    this.activationKeyRepository = activationKeyRepository;
-  }
+  private final EmailTemplateService emailTemplateService;
 
   public List<ActivationKey> getAllKeys() {
     return activationKeyRepository.findAll();
@@ -104,5 +103,26 @@ public class ActivationKeyService {
     if (updated > 0) {
       System.out.println("⚡ " + updated + " clés expirées ont été marquées comme utilisées.");
     }
+  }
+
+  public ActivationKey generateAndSendActivationKey(String email) {
+
+    ActivationKey key = generateKey();
+
+    emailTemplateService.sendAccountActivationEmail(email, key.getKeyValue());
+
+    return key;
+  }
+
+  public ActivationKey generateAndSendResetKey(String email) {
+
+    ActivationKey key = generateKey();
+
+    key.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+    activationKeyRepository.save(key);
+
+    emailTemplateService.sendPasswordResetEmail(email, key.getKeyValue());
+
+    return key;
   }
 }
