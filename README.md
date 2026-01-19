@@ -57,7 +57,5 @@ Contact
 -------
 Pour questions ou contributions > [Me contacter](https://ranto-io.vercel.app/#contact)
 
-Auteur
-------
-
-> RAFALIMANANA Ranto Handraina
+![License](https://img.shields.io/badge/license-Private-lightgrey)
+![Auteur](https://img.shields.io/badge/auteur-ImRanto-informational)
