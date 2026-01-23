@@ -24,9 +24,13 @@ public class ApiKeyFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     String path = request.getRequestURI();
 
-    // Vérifie uniquement pour /api/auth/? et /pingR
     if (path.startsWith("/api/auth/register")
         || path.equals("/api/auth/login")
         || path.equals("/api/auth/reset-password")
@@ -35,6 +39,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         || path.equals("/api/emails/send")
         || path.equals("/api/auth/check-email")
         || path.equals("/pingR")) {
+
       String apiKey = request.getHeader(API_KEY_HEADER);
 
       if (apiKey == null || !apiKey.equals(validApiKey)) {
