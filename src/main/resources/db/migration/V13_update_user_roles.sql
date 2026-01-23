@@ -1,0 +1,1 @@
+UPDATE utilisateurs SET role = 'SELLER' WHERE role = 'VENTE';
