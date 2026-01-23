@@ -37,11 +37,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         || path.equals("/pingR")) {
       String apiKey = request.getHeader(API_KEY_HEADER);
 
-      if (path.startsWith("/api/auth/") || path.equals("/pingR")) {
-        filterChain.doFilter(request, response);
-        return;
-      }
-
       if (apiKey == null || !apiKey.equals(validApiKey)) {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write("Invalid or missing API key");
